@@ -1,8 +1,8 @@
 # Spike S4: WhisperKit medium install size on a real device
 
-**Status:** Not started
-**Owner:**
-**Started:**
+**Status:** In progress
+**Owner:** Mark Labrecque
+**Started:** 2026-05-22
 **Completed:**
 **Linked from:** [TDD §6.1](../TDD.md), [MILESTONES.md M1](../MILESTONES.md)
 
@@ -27,20 +27,29 @@ PRD §4 commits to "no first-run download." TDD §6.1 chose bundling (Option A) 
 7. Note: App Store uses per-device thinning — sizes may differ between A16 and A17 builds. Capture both if both are available.
 
 **Test environment:**
-- Device(s): one iPhone for installed-size measurement.
+- Device(s): one iPhone for installed-size measurement (pending).
 - iOS version: latest 26.x.
-- Xcode version:
-- Submitting from: Mac details (relevant if any local archive bloat is suspected).
+- Xcode version: (recorded at archive time)
+- Submitting from: Mac mini / macOS 15.x.
 
 ## 4. Raw findings
 
 | Metric | Value |
 |---|---|
-| Local IPA file size |  |
-| App Store download size (A16 thinned) |  |
-| App Store download size (A17 thinned) |  |
-| Installed size on device |  |
-| Cellular download limit reached? (200 MB threshold) | yes / no |
+| Local IPA file size | **1.35 GB** (1,413,707,355 bytes; 1,348 MB) |
+| Signed `.app` bundle on disk | **1.4 GB** (TextDecoder 872 MB + AudioEncoder 586 MB + binary 2.5 MB) |
+| App Store download size (A16 thinned) | _pending TestFlight upload_ |
+| App Store download size (A17 thinned) | _pending TestFlight upload_ |
+| Installed size on device | _pending TestFlight install_ |
+| Cellular download limit reached? (200 MB threshold) | **yes** (1.35 GB ≫ 200 MB) |
+
+**Method used for local IPA measurement:**
+- `xcodebuild archive` on Release, generic/platform=iOS, code-signed (Team `QS946Z5WWB`).
+- `xcodebuild -exportArchive` with `method=development`, `thinning=<none>` (fat IPA, no App Store thinning applied).
+- The number above is therefore an **upper bound** on what the App Store will deliver; per-device thinned variants in ASC will be smaller.
+
+**Packaging note (M3 concern, not S4-blocking):**
+The `.mlmodelc` directories landed at the **root** of the `.app` bundle rather than at `Models/openai_whisper-medium/`. Xcode's "Copy Bundle Resources" phase is flattening the directory structure. WhisperKit's runtime loader expects models at a path like `<bundle>/openai_whisper-medium/`. Fix needed before M3: declare the model directory as a folder reference in `project.yml` (e.g. via `buildPhase: resources` with `type: folder`) so XcodeGen preserves the hierarchy. Does not change the install-size number.
 
 _(App Store imposes a 200 MB cellular download limit; over that, users must be on Wi-Fi or explicitly opt in. This matters for first-launch experience.)_
 
