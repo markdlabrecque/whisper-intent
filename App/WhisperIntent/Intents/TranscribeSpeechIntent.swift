@@ -5,9 +5,9 @@ import WhisperIntentCore
 /// Records audio, transcribes on-device with WhisperKit, returns the transcript as a String.
 /// Implementation deferred to M5 (after S2 confirms foreground-escalation API).
 struct TranscribeSpeechIntent: AppIntent {
-  static var title: LocalizedStringResource = "Transcribe Speech"
+  static let title: LocalizedStringResource = "Transcribe Speech"
 
-  static var description = IntentDescription(
+  static let description = IntentDescription(
     """
     Record audio and return the transcript as text. Use this as a step in a Shortcut \
     to capture voice input for any destination.
@@ -23,9 +23,7 @@ struct TranscribeSpeechIntent: AppIntent {
   @Parameter(title: "Prompt", default: nil)
   var prompt: String?
 
-  static var openAppWhenRun: Bool {
-    false
-  }
+  static let openAppWhenRun: Bool = false
 
   @MainActor
   func perform() async throws -> some IntentResult & ReturnsValue<String> {
