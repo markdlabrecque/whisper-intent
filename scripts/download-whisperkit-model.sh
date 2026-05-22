@@ -41,9 +41,16 @@ elif command -v git >/dev/null 2>&1 && command -v git-lfs >/dev/null 2>&1; then
   echo "huggingface-cli not found; falling back to git + LFS sparse checkout …"
   TMP_DIR="$(mktemp -d)"
   trap 'rm -rf "$TMP_DIR"' EXIT
-  git clone --depth=1 --filter=blob:none --sparse \
+  # HF's smart HTTP server doesn't support partial clones reliably, so we do
+  # a full shallow clone with LFS smudge disabled, then pull only the model
+  # we want via sparse-checkout + targeted LFS fetch.
+  GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --no-checkout \
     "https://huggingface.co/$HF_REPO" "$TMP_DIR/repo"
-  (cd "$TMP_DIR/repo" && git sparse-checkout set "$MODEL" && git lfs pull --include "$MODEL/*")
+  (cd "$TMP_DIR/repo" \
+    && git sparse-checkout init --cone \
+    && git sparse-checkout set "$MODEL" \
+    && git checkout \
+    && git lfs pull --include "$MODEL/**")
   mv "$TMP_DIR/repo/$MODEL"/* "$DEST_DIR/"
 else
   echo "ERROR: need either huggingface-cli or (git + git-lfs) installed." >&2
