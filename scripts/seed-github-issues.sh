@@ -38,8 +38,8 @@ create_milestone() {
   gh api "repos/$REPO/milestones" \
     -f title="$title" \
     -f description="$description" \
-    -f state=open \
-    --jq '.number'
+    -f state=open >/dev/null
+  printf '%s' "$title"
 }
 
 echo "Creating milestones …"
@@ -58,7 +58,7 @@ M6=$(create_milestone "M6 — Hardening + TestFlight" \
 M7=$(create_milestone "M7 — v1 GA" \
   "App Store submission and post-launch monitoring. See docs/MILESTONES.md M7.")
 
-echo "Milestones created: M1=$M1 M2=$M2 M3=$M3 M4=$M4 M5=$M5 M6=$M6 M7=$M7"
+echo "Milestones created."
 
 # ---------------------------------------------------------------------------
 # Issues
@@ -66,11 +66,11 @@ echo "Milestones created: M1=$M1 M2=$M2 M3=$M3 M4=$M4 M5=$M5 M6=$M6 M7=$M7"
 
 create_issue() {
   local title="$1"
-  local milestone_number="$2"
+  local milestone_title="$2"
   local body="$3"
   gh issue create --repo "$REPO" \
     --title "$title" \
-    --milestone "$milestone_number" \
+    --milestone "$milestone_title" \
     --body "$body" >/dev/null
   echo "  ✓ $title"
 }
