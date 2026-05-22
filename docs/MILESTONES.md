@@ -196,7 +196,7 @@ With the domain working and the cap known, build the user-facing layers.
 
 | Risk | Where it surfaces | Mitigation |
 |---|---|---|
-| Install size too large for App Store distribution | M1 / S4 | Fallback to On-Demand Resources, accept first-run download UX cost. |
+| ~~Install size too large for App Store distribution~~ | ~~M1 / S4~~ | **Monitoring (downgraded 2026-05-22):** S4 measured local IPA at 1.35 GB; bundling decision (Option A) confirmed. Thinned App Store numbers deferred to M6 — fallback if those land much worse than expected is a smaller model variant, not ODR. |
 | WhisperKit progress callbacks are too coarse | M2 / S1 | Ship indeterminate spinner; revisit in v2 — already an acceptable PRD outcome. |
 | Foreground escalation API doesn't work cleanly | M2 / S2 | Ship two AppIntents instead — uglier in Shortcuts but functional. |
 | Background cap has to be uncomfortably short | M4 / S3 | Reframe as "designed for quick capture, not long-form" in marketing — or ship without `showUI = false` support in v1 and revisit. Requires scope conversation. |

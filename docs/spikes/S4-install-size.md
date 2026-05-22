@@ -1,9 +1,9 @@
 # Spike S4: WhisperKit medium install size on a real device
 
-**Status:** In progress
+**Status:** Complete (provisional — thinned/installed numbers deferred to M6)
 **Owner:** Mark Labrecque
 **Started:** 2026-05-22
-**Completed:**
+**Completed:** 2026-05-22
 **Linked from:** [TDD §6.1](../TDD.md), [MILESTONES.md M1](../MILESTONES.md)
 
 ---
@@ -55,22 +55,26 @@ _(App Store imposes a 200 MB cellular download limit; over that, users must be o
 
 ## 5. Interpretation
 
-_(is the download size in a defensible range for an enthusiast utility? does it cross the cellular threshold? are there any obvious wins — model file format, dead resources, asset catalog opportunities — that would meaningfully shrink it?)_
+A 1.35 GB fat IPA is large for a utility app but defensible for an enthusiast tool that promises fully-offline, on-device speech recognition. Two facts shape this:
+
+- **The 200 MB cellular threshold is unreachable** with the medium model bundled — first installs and updates over cellular will require either Wi-Fi or an explicit "Download Anyway" tap. This is a real onboarding friction but not a blocker for the target audience (power users adding the Shortcut deliberately).
+- **App Store per-device thinning will reduce this number meaningfully**, but the bulk of the payload is two Core ML model directories that are not architecture-thinnable in the same way an executable slice is. The thinned numbers (M6) are unlikely to drop below ~1 GB.
+
+No obvious low-effort wins in the bundle: app binary is 2.5 MB; everything else is the model. Meaningful reductions would require switching to a smaller/quantized model variant, which would change S1's transcription quality input — out of scope for v1.
 
 ## 6. Decision
 
-_Pick one:_
+**Proceed with bundling (Option A).**
 
-- **Proceed with bundling (Option A).** Install size is acceptable for the target audience. PRD and TDD stand.
-- **Fall back to On-Demand Resources (Option B).** Install size is impractical. Accept the first-run download UX cost; update PRD §4 and TDD §6.1.
-- **Proceed with bundling, but optimize.** Bundle now, but track size reduction work (e.g., switching to a quantized model variant, dropping unused languages) as a v1.x follow-up.
+Install size is acceptable for the v1 target audience. PRD §4's "no first-run download" commitment stands. Thinned download size and on-device installed size are deferred to M6, when the first TestFlight upload happens. If the M6 numbers come in dramatically worse than expected (e.g. >2 GB installed, or App Store review pushback), the fallback is to bundle a smaller model variant rather than switch to On-Demand Resources — ODR would contradict the "no first-run download" promise that anchors the whole product.
 
 **Updates required in other docs:**
-- [ ] TDD §6.1 — pin the chosen option.
-- [ ] PRD §4 (if Option B) — document the first-run download.
-- [ ] Onboarding screen copy (if Option B) — explain the download.
-- [ ] Risk register in MILESTONES.md — close or update the "install size too large" risk.
+- [x] TDD §6.1 — pin the chosen option (Option A confirmed).
+- [ ] Risk register in MILESTONES.md — downgrade the "install size too large" risk from open to monitoring; re-evaluate at M6 with thinned numbers.
+- [ ] App Store description copy (later, in M6) — call out the size + Wi-Fi requirement so the first-install experience isn't a surprise.
 
 ## 7. Follow-ups
 
--
+- **M3:** Fix the bundle-resource flattening — `.mlmodelc` directories currently land at the root of the `.app` instead of `Models/openai_whisper-medium/`. WhisperKit's loader will not find them as-is.
+- **M6:** Record App Store Connect thinned download size (A16, A17) and on-device installed size; close out this spike doc's deferred rows.
+- **M6:** Decide whether to ship a "Download over Wi-Fi only" hint in App Store metadata given the cellular threshold is exceeded.

@@ -133,7 +133,7 @@ The medium model (~1.5 GB on disk) is bundled in `Resources/Models/`. Two delive
 - **Option A (preferred):** ship as part of the main app bundle. Adds ~1.5 GB to install size.
 - **Option B (fallback):** ship via On-Demand Resources (ODR). Smaller install footprint, but model is downloaded after first launch — contradicts the "no first-run download" PRD goal.
 
-**Decision:** Option A. The PRD's "no first-run download" requirement and the realities of Shortcuts users wiring up an automation only to have it fail because the model isn't downloaded yet make ODR a poor fit. Install-size cost is acknowledged; if App Store conversion data shows it hurting, revisit in a point release.
+**Decision (confirmed by spike S4, 2026-05-22):** Option A. Local fat IPA measured at 1.35 GB; signed `.app` bundle 1.4 GB. The PRD's "no first-run download" requirement and the realities of Shortcuts users wiring up an automation only to have it fail because the model isn't downloaded yet make ODR a poor fit. If thinned App Store numbers at M6 come in dramatically worse than expected, the fallback is a smaller model variant — not ODR. See [docs/spikes/S4-install-size.md](spikes/S4-install-size.md).
 
 Model files (Core ML `.mlmodelc` directories for encoder + decoder + tokenizer JSON) live under `Resources/Models/openai_whisper-medium/`. Verified at app launch — if files are missing or corrupted, app shows an error and refuses to start (this is a build/packaging error, not a user-recoverable state).
 
