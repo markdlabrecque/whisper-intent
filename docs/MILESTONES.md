@@ -38,11 +38,12 @@ Bare scaffolding to make subsequent work measurable.
 - [x] WhisperKit dependency added, pinned version. _(0.18.0, exact pin.)_
 - [x] CI pipeline (GitHub Actions): build + test on every push. _(`.github/workflows/ci.yml`. App-target job commented out until GitHub runners ship Xcode 26.)_
 - [x] `docs/spikes/` directory created with a template for spike reports.
-- [ ] App icon placeholder, bundle ID registered, App Store Connect record created. _(Bundle ID set to `com.marklabrecque.whisperintent` in `project.yml`. App icon directory exists but is empty. Apple Developer registration + App Store Connect record require manual setup by the developer.)_
+- [x] App icon placeholder, bundle ID registered. _(Bundle ID `com.marklabrecque.whisperintent` registered with Apple Developer. App icon directory exists; real icon to be added before M6.)_
+- [ ] ~~App Store Connect record created.~~ **Deferred to M6.** Not needed until TestFlight uploads start. Reopening at M6.
 
 **Exit:** `xcodebuild` builds a do-nothing app that launches to an empty `RootView` on a real device.
 
-**Status (2026-05-22):** SwiftPM package builds and tests pass (`swift build` / `swift test` in `Packages/WhisperIntentCore/`). Full `xcodebuild` validation pending Xcode 26 generate + run on a device.
+**Status (2026-05-22): Closed.** SwiftPM package builds and tests pass. App target builds via XcodeGen-generated `.xcodeproj` and launches on device showing the stub `RootView`. M0 exit criterion met. App Store Connect record deferred to M6.
 
 ---
 
