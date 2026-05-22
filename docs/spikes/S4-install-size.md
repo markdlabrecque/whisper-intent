@@ -49,8 +49,8 @@ PRD §4 commits to "no first-run download." TDD §6.1 chose bundling (Option A) 
 - `xcodebuild -exportArchive` with `method=development`, `thinning=<none>` (fat IPA, no App Store thinning applied).
 - The number above is therefore an **upper bound** on what the App Store will deliver; per-device thinned variants in ASC will be smaller.
 
-**Packaging note (M3 concern, not S4-blocking):**
-The `.mlmodelc` directories landed at the **root** of the `.app` bundle rather than at `Models/openai_whisper-medium/`. Xcode's "Copy Bundle Resources" phase is flattening the directory structure. WhisperKit's runtime loader expects models at a path like `<bundle>/openai_whisper-medium/`. Fix needed before M3: declare the model directory as a folder reference in `project.yml` (e.g. via `buildPhase: resources` with `type: folder`) so XcodeGen preserves the hierarchy. Does not change the install-size number.
+**Packaging note (resolved 2026-05-22):**
+Initial archive flattened the `.mlmodelc` directories to the `.app` bundle root because XcodeGen's `sources: App/WhisperIntent` recursively claimed the model dir as a group, overriding the `type: folder` resource entry. Fixed by (a) adding `Resources/Models/openai_whisper-medium` (and the README) to the sources `excludes`, and (b) declaring the model as a folder-reference source with `buildPhase: resources` and `type: folder`. Verified: model now lives at `<bundle>/openai_whisper-medium/` with directory structure preserved. Install-size number unchanged.
 
 _(Apple's documented iOS app ceiling is 4 GB uncompressed and 80 MB for the binary's combined `__TEXT` sections — see [Maximum Build File Sizes](https://developer.apple.com/help/app-store-connect/reference/maximum-build-file-sizes/). The historical 200 MB hard cellular download cap was removed years ago; modern iOS instead prompts the user to confirm large downloads over cellular without blocking. This still matters for first-launch UX — a Shortcuts user triggering install on the go will see a confirmation dialog.)_
 
@@ -77,6 +77,6 @@ Install size is acceptable for the v1 target audience. PRD §4's "no first-run d
 
 ## 7. Follow-ups
 
-- **M3:** Fix the bundle-resource flattening — `.mlmodelc` directories currently land at the root of the `.app` instead of `Models/openai_whisper-medium/`. WhisperKit's loader will not find them as-is.
+- ~~**M3:** Fix the bundle-resource flattening — `.mlmodelc` directories currently land at the root of the `.app` instead of `Models/openai_whisper-medium/`. WhisperKit's loader will not find them as-is.~~ **Done 2026-05-22** (folder reference via `type: folder` + `buildPhase: resources` in project.yml).
 - **M6:** Record App Store Connect thinned download size (A16, A17) and on-device installed size; close out this spike doc's deferred rows.
 - **M6:** Decide whether to call out the ~1+ GB install size in App Store metadata so on-the-go Shortcuts users aren't surprised by the cellular confirmation prompt.

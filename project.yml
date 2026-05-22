@@ -30,8 +30,18 @@ targets:
     platform: iOS
     sources:
       - path: App/WhisperIntent
-    resources:
-      - path: App/WhisperIntent/Resources
+        excludes:
+          # Model dir is added as an explicit folder-reference source below.
+          # If we let it recurse into Models/, XcodeGen creates a group and
+          # `.mlmodelc` dirs end up flattened to the bundle root.
+          - "Resources/Models/openai_whisper-medium"
+          - "Resources/Models/openai_whisper-medium/**"
+          - "Resources/Models/README.md"
+      # Folder reference (blue folder in Xcode) — preserves directory structure
+      # so WhisperKit can find model files at <bundle>/openai_whisper-medium/.
+      - path: App/WhisperIntent/Resources/Models/openai_whisper-medium
+        type: folder
+        buildPhase: resources
     info:
       path: App/WhisperIntent/Info.plist
       properties:
