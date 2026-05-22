@@ -1,0 +1,11 @@
+# Format check (no auto-fix on commit; surfaces issues only)
+swiftformat --lint .
+
+# Lint. Explicit paths keep swiftlint from descending into .build/.
+swiftlint --strict --quiet App Packages/WhisperIntentCore/Sources Packages/WhisperIntentCore/Tests Packages/WhisperIntentCore/Package.swift
+
+# Secret scan over staged changes. --redact ensures any detected secret value
+# is not printed to the terminal (only its location). Uses gitleaks' default
+# rule set; add a .gitleaks.toml at the repo root if project-specific rules
+# are needed later.
+gitleaks git --staged --no-banner --redact

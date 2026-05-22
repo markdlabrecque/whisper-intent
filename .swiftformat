@@ -1,0 +1,16 @@
+# SwiftFormat config — keeps formatting consistent with .editorconfig
+
+--indent 2
+--maxwidth 120
+--swiftversion 6.0
+
+--self remove
+--importgrouping testable-bottom
+--commas inline
+--trimwhitespace always
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--closingparen balanced
+
+--exclude .build,DerivedData,WhisperIntent.xcodeproj

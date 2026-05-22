@@ -1,0 +1,47 @@
+included:
+  - App
+  - Packages/WhisperIntentCore/Sources
+  - Packages/WhisperIntentCore/Tests
+  - Packages/WhisperIntentCore/Package.swift
+
+excluded:
+  - "**/.build"
+  - "**/.swiftpm"
+  - "**/DerivedData"
+  - "**/WhisperIntent.xcodeproj"
+
+disabled_rules:
+  - todo  # we intentionally leave TODO markers for deferred work
+
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - explicit_init
+  - first_where
+  - last_where
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+
+analyzer_rules:
+  - unused_import
+
+line_length:
+  warning: 120
+  error: 200
+  ignores_comments: true
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - id
+    - x
+    - y
+
+type_name:
+  min_length: 3
+
+cyclomatic_complexity:
+  warning: 12
+
+reporter: "xcode"
