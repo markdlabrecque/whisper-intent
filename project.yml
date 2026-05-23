@@ -36,7 +36,8 @@ targets:
           # `.mlmodelc` dirs end up flattened to the bundle root.
           - "Resources/Models/openai_whisper-medium"
           - "Resources/Models/openai_whisper-medium/**"
-          - "Resources/Models/README.md"
+          # Developer-facing READMEs aren't ship resources.
+          - "**/README.md"
       # Folder reference (blue folder in Xcode) — preserves directory structure
       # so WhisperKit can find model files at <bundle>/openai_whisper-medium/.
       - path: App/WhisperIntent/Resources/Models/openai_whisper-medium
