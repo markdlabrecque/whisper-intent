@@ -66,18 +66,30 @@ struct DebugRecordingView: View {
   }
 
   private var levelBlock: some View {
-    Group {
-      if case let .recording(_, level) = state {
-        ProgressView(value: Double(level))
-          .progressViewStyle(.linear)
-          .tint(.red)
-      } else {
-        ProgressView(value: 0)
-          .progressViewStyle(.linear)
-          .tint(.secondary)
+    VStack(spacing: 4) {
+      Group {
+        if case let .recording(_, level) = state {
+          ProgressView(value: Double(level))
+            .progressViewStyle(.linear)
+            .tint(.red)
+        } else {
+          ProgressView(value: 0)
+            .progressViewStyle(.linear)
+            .tint(.secondary)
+        }
       }
+      Text(currentLevelText)
+        .font(.caption2.monospaced())
+        .foregroundStyle(.secondary)
     }
     .frame(maxWidth: .infinity)
+  }
+
+  private var currentLevelText: String {
+    if case let .recording(_, level) = state {
+      return String(format: "level: %.4f", level)
+    }
+    return "level: —"
   }
 
   private var transcriptBlock: some View {
