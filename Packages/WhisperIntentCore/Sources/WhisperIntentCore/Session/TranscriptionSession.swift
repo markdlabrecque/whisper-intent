@@ -90,12 +90,16 @@ public actor TranscriptionSession {
     let levelHandler: @Sendable (Float) -> Void = { [weak self] level in
       Task { [weak self] in await self?.updateLevel(level) }
     }
+    let stoppedHandler: @Sendable (AudioRecorderStopReason) -> Void = { [weak self] reason in
+      Task { [weak self] in await self?.handleRecorderSelfStop(reason: reason) }
+    }
 
     do {
       try await recorder.start(
         maxDuration: config.maxDuration,
         buffers: buffersHandler,
-        level: levelHandler
+        level: levelHandler,
+        stopped: stoppedHandler
       )
     } catch let error as SessionError {
       finish(.failure(error))
@@ -175,6 +179,20 @@ public actor TranscriptionSession {
   private func updateLevel(_ level: Float) {
     guard case let .recording(startedAt, _) = state else { return }
     setState(.recording(startedAt: startedAt, level: level))
+  }
+
+  private func handleRecorderSelfStop(reason: AudioRecorderStopReason) async {
+    guard case .recording = state else { return }
+    switch reason {
+    case .normal:
+      // Recorder ended capture cleanly (max-duration). Treat as user-initiated stop.
+      await stopRecording()
+    case let .failure(error):
+      // Recorder ended capture because of an error. Tear down without transcribing.
+      pipeline?.cancel()
+      pipeline = nil
+      finish(.failure(error))
+    }
   }
 
   // MARK: - Internal: transcription pipeline
