@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Whisper Intent — Speech Bubble Puzzle Piece concept">
+  <title>Whisper Intent — Speech Bubble Puzzle Piece</title>
+
+  <!-- Background tile (remove for transparent export) -->
+  <rect width="512" height="512" rx="112" fill="#0B1220"/>
+
+  <!--
+    Concept 2: A rounded speech bubble whose "tail" is a Shortcuts-style
+    male connector tab on the right side, and a matching female notch
+    cut into the left side. The bubble is itself a puzzle piece in a chain.
+    Inside: a small 3-bar waveform suggests captured voice.
+  -->
+
+  <!--
+    Bubble path:
+      - Rounded rect body, roughly x:96–416, y:128–384
+      - Female notch on left edge (semicircle cut inward)
+      - Male tab on right edge (semicircle pushed outward)
+    Drawn as a single closed path so fill/stroke stay clean.
+  -->
+  <path d="
+    M 160 128
+    H 384
+    Q 416 128 416 160
+    V 224
+    Q 448 224 448 256
+    Q 448 288 416 288
+    V 352
+    Q 416 384 384 384
+    H 160
+    Q 128 384 128 352
+    V 288
+    Q 96  288 96  256
+    Q 96  224 128 224
+    V 160
+    Q 128 128 160 128
+    Z"
+    fill="#F5F1E8"
+    stroke="#0B1220"
+    stroke-width="10"
+    stroke-linejoin="round"/>
+
+  <!-- Waveform "captured voice" inside the bubble -->
+  <g stroke="#0B1220" stroke-width="22" stroke-linecap="round" fill="none">
+    <line x1="208" y1="232" x2="208" y2="280"/>
+    <line x1="256" y1="208" x2="256" y2="304"/>
+    <line x1="304" y1="240" x2="304" y2="272"/>
+  </g>
+</svg>

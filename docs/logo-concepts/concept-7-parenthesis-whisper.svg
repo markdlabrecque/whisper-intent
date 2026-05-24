@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Whisper Intent — Parenthesis Whisper concept">
+  <title>Whisper Intent — Parenthesis Whisper</title>
+
+  <!-- Background tile (remove for transparent export) -->
+  <rect width="512" height="512" rx="112" fill="#0B1220"/>
+
+  <!--
+    Concept 7: Two soft parentheses ( ) enclosing a short waveform.
+    Reads as cupped hands around a whisper AND as a function call (input).
+    Parens drawn as open arcs; waveform is 3 bars of varying height.
+  -->
+
+  <g fill="none" stroke="#F5F1E8" stroke-width="28" stroke-linecap="round">
+    <!-- Left paren: arc opening to the right -->
+    <path d="M 200 128 Q 46 256 185 384"/>
+    <!-- Right paren: arc opening to the left -->
+    <path d="M 312 128 Q 465 256 305 384"/>
+  </g>
+
+  <!-- Inner waveform / "spoken token" -->
+  <g stroke="#7CC4FF" stroke-width="22" stroke-linecap="round" fill="none">
+    <line x1="224" y1="232" x2="224" y2="280"/>
+    <line x1="256" y1="200" x2="256" y2="312"/>
+    <line x1="288" y1="240" x2="288" y2="272"/>
+  </g>
+</svg>
