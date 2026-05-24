@@ -273,6 +273,8 @@ Bound to `TranscriptionSession.state`. Renders:
 - `.processing` → progress bar/spinner + "Transcribing..." label.
 - `.completed` / `.failed` → dismisses itself (control returns to Shortcut).
 
+**Level metering note (M5):** `state.recording.level` is linear RMS in `[0, 1]`. Raw RMS values from voice cluster in `[0.01, 0.2]`, which is too narrow for a meaningful visual response — apply a dB-style remap before rendering (see `DebugRecordingView.displayLevel(rms:)` for the formula already validated on device in M3). Consider colour-coding the meter by volume band when the production UI is being designed; tracked as a follow-up rather than a v1 requirement.
+
 Presented as a `.sheet` from the app's root scene when the AppIntent escalates to foreground. Non-dismissable via swipe-down during `.processing` would be ideal, but iOS 26's sheet API allows swipe-down regardless — instead, the dismiss path is made safe via §5.8 (re-entry).
 
 ### 8.2 `RootView` (re-entry surface, PRD §5.8)
