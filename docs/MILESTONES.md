@@ -104,14 +104,16 @@ Bare scaffolding to make subsequent work measurable.
 
 With spikes settled, the design in TDD §3–§6 is implementable.
 
-- [ ] `TranscriptionSession` actor with the full state machine.
-- [ ] `RecordingLock` semantics validated via unit tests.
-- [ ] `AudioRecorder` over `AVAudioEngine`: 16 kHz mono PCM, `.measurement` mode, route/interruption handling.
-- [ ] `VoiceActivityDetector` (energy-based) with 500ms warmup and configurable threshold.
-- [ ] `WhisperKitTranscriber` adapter that emits the `TranscriptionProgress` enum shape decided in S1.
-- [ ] Unit test coverage of session state transitions with mocked recorder and transcriber.
+- [x] `TranscriptionSession` actor with the full state machine.
+- [x] `RecordingLock` semantics validated via unit tests.
+- [x] `AudioRecorder` over `AVAudioEngine`: 16 kHz mono PCM, `.measurement` mode, route/interruption handling.
+- [x] `VoiceActivityDetector` (energy-based) with 500ms warmup and configurable threshold.
+- [x] `WhisperKitTranscriber` adapter that emits the `TranscriptionProgress` enum shape decided in S1.
+- [x] Unit test coverage of session state transitions with mocked recorder and transcriber.
 
 **Exit:** `WhisperIntentCore` can record a sample audio file from a real mic, transcribe it via WhisperKit medium, and emit a final transcript string — all driven by `TranscriptionSession`, with progress callbacks flowing through the state stream. Verified on a real device via a temporary in-app debug button. No AppIntent yet.
+
+**Status (2026-05-24): Closed.** On-device verification on iPhone (iOS 26.4.2) walked every section of the M3 test plan with `pass` on all rows — golden-path short utterance, ~60 s long utterance, phone-call interruption surfacing `failed(interrupted)`, AirPods route-loss surfacing `failed(interrupted)`, permission-denial path, backgrounding, memory flat across 5 consecutive cycles, no console errors. 22 unit tests green. `DebugRecordingView` lives behind the spike harness screen and is the in-app debug button required by the exit criterion; it's marked for removal in M6 alongside the spike harnesses. One UX tweak landed during testing: the level meter now uses a dB-style remap of the raw RMS so the bar responds across the full range of voice (see TDD §8.1 for the formula M5 should reuse).
 
 ---
 
