@@ -24,8 +24,19 @@ struct DebugSpikesView: View {
     }
   }
 
+  @State private var showRecordingHarness = false
+
   private var controls: some View {
     VStack(alignment: .leading, spacing: 12) {
+      Text("M3 — recording end-to-end").font(.headline)
+      Button("Open recording harness") { showRecordingHarness = true }
+        .disabled(isRunning)
+        .sheet(isPresented: $showRecordingHarness) {
+          DebugRecordingView()
+        }
+
+      Divider()
+
       Text("Spike S1 — progress callbacks").font(.headline)
       HStack {
         Button("Run 30s sample") { Task { await run(sample: "sample-30s") } }

@@ -12,6 +12,8 @@ final class AppEnvironment: ObservableObject {
     transcriber: WhisperKitTranscriber()
   )
 
+  let permissions = PermissionsService()
+
   /// Spike S2 harness state — remove (or re-gate) before TestFlight in M6.
   @Published var helloPresentation: DebugHelloPresentation?
 
