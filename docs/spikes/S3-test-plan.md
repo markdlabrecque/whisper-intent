@@ -9,24 +9,29 @@ Tick boxes inline as you go. Capture results into both this file (working sheet)
 
 ## 0. Prerequisites
 
-- [ ] **Oldest** iOS 26-capable iPhone available (note model + iOS version: `___________`). The cap must be set to what the oldest device can handle, not what your newest one can.
-- [ ] One additional iPhone (any iOS 26 generation) for the cross-device comparison row (optional, marks the headroom on newer hardware).
-- [ ] Mac running Xcode 26.x.
-- [ ] Device paired to Xcode, developer mode enabled.
-- [ ] iPhone is **on battery, not plugged in** — matches real-world conditions and lets thermal effects appear.
-- [ ] iPhone is **not in Low Power Mode** unless you explicitly want to test that case.
-- [ ] Stopwatch handy (the iOS Clock app's Stopwatch tab works), or a known-duration audio source you can play back into the mic (audiobook segment, etc.).
-- [ ] Branch checked out: `feat/m4-spike-s3-intent` (or whatever branch carries the wired `TranscribeSpeechIntent`).
+- [X] **Oldest** iOS 26-capable iPhone available (note model + iOS version: `iphone 17 + iOS 26.4.2`). The cap must be set to what the oldest device can handle, not what your newest one can.
+- [n/a] One additional iPhone (any iOS 26 generation) for the cross-device comparison row (optional, marks the headroom on newer hardware).
+- [X] Mac running Xcode 26.x.
+- [X] Device paired to Xcode, developer mode enabled.
+- [X] iPhone is **on battery, not plugged in** — matches real-world conditions and lets thermal effects appear.
+- [X] iPhone is **not in Low Power Mode** unless you explicitly want to test that case.
+- [X] Branch checked out: `feat/m4-spike-s3-intent` (or whatever branch carries the wired `TranscribeSpeechIntent`).
+- [ ] **Generate playback samples:** from the project root, `bash scripts/generate-s3-samples.sh`. Produces `s3-samples/sample-{10s,30s,60s,90s,120s,180s,300s}.wav` (gitignored). Each is a cumulative extension of the previous — the 5-minute sample contains the full narrative, and shorter samples are prefixes. Lets you spot mid-recording drops at a glance: a "good" 60s transcript should be a prefix of a "good" 90s transcript, and so on. **Why pre-recorded:** S3 is a controlled experiment; removing the human voice as a variable makes runs comparable across devices and across days. Note: actual sample durations land ~85–100 % of their label (verify with `afinfo s3-samples/sample-*.wav`); the spike's conclusion is unaffected, but record the actual durations in the §4 table notes.
+- [ ] **Playback rig:** how you'll route a Mac (or any audio source) into the iPhone's microphone. Options, in rough order of fidelity:
+  - **Mac speakers → iPhone mic, in a quiet room** (lowest setup; some ambient noise contamination). Place the phone ~30 cm from the speaker.
+  - **Wired or AirPlay loopback** via a second device.
+  - **Cabled audio interface** if you have one (best fidelity, no acoustic path).
+  Whichever you use, run `sample-10s.wav` through `S3 Foreground` once and check that the returned transcript reads roughly like the sample's text — that confirms the rig works before you start the duration ladder.
 
 ---
 
 ## 1. Build & install
 
-- [ ] From the project root: `make generate` to regenerate the Xcode project.
-- [ ] Open `WhisperIntent.xcodeproj`.
-- [ ] Select the **WhisperIntent** scheme, **Release** configuration (Debug skews ML perf and we want representative timing).
-- [ ] Build & Run to the oldest test iPhone.
-- [ ] Confirm the app launches and `RootView` appears.
+- [X] From the project root: `make generate` to regenerate the Xcode project.
+- [X] Open `WhisperIntent.xcodeproj`.
+- [X] Select the **WhisperIntent** scheme, **Release** configuration (Debug skews ML perf and we want representative timing).
+- [X] Build & Run to the oldest test iPhone.
+- [X] Confirm the app launches and `RootView` appears.
 
 **Observed build / iOS version:** `___________`
 
@@ -57,11 +62,18 @@ Tick boxes inline as you go. Capture results into both this file (working sheet)
 
 ## 4. Duration ladder — `showUI = false` (the load-bearing measurement)
 
-For each row: open the **Stopwatch**, tap `S3 Background` on the home screen, immediately start the stopwatch, speak continuously for the target duration, then stop speaking and stop the stopwatch. The VAD will trigger ~1 second after you stop, then the recorder hands off to WhisperKit. **Wait** for Show Content to appear with the transcript. **Then** record:
+For each row:
 
-- **Captured?** ✅ if Show Content displayed a transcript matching what you said. ❌ if the Shortcut showed an error, an empty result, or never returned.
+1. Queue up the matching playback sample (e.g., for the 60 s row, open `s3-samples/sample-60s.wav` in QuickTime or your audio player of choice, but **don't start playback yet**).
+2. Start the Stopwatch (iOS Clock app), tap `S3 Background` on the home screen.
+3. **Immediately** start playback of the sample. The Shortcut's recording will pick it up via the iPhone's mic.
+4. When the sample finishes playing, leave the iPhone alone. The VAD will trigger ~1 second after the audio stops, then the recorder hands off to WhisperKit.
+5. **Wait** for Show Content to appear with the transcript.
+6. **Then** record:
+
+- **Captured?** ✅ if Show Content displayed a transcript that matches (or is a sensible prefix of) the sample's text. ❌ if the Shortcut showed an error, an empty result, or never returned.
 - **Total wall-clock** = stopwatch reading when Show Content appears.
-- **Notes** = anything unusual (Dynamic Island indicator disappeared mid-run, app crashed, system notification, etc.).
+- **Notes** = anything unusual (Dynamic Island indicator disappeared mid-run, app crashed, system notification, the transcript was a short prefix that suggests mid-recording termination, etc.).
 
 Each row gets **three runs** to detect flakiness.
 
