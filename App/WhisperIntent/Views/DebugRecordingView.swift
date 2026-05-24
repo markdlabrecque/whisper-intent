@@ -69,7 +69,7 @@ struct DebugRecordingView: View {
     VStack(spacing: 4) {
       Group {
         if case let .recording(_, level) = state {
-          ProgressView(value: Double(level))
+          ProgressView(value: displayLevel(rms: level))
             .progressViewStyle(.linear)
             .tint(.red)
         } else {
@@ -87,9 +87,21 @@ struct DebugRecordingView: View {
 
   private var currentLevelText: String {
     if case let .recording(_, level) = state {
-      return String(format: "level: %.4f", level)
+      let display = displayLevel(rms: level)
+      return String(format: "rms: %.4f  bar: %.2f", level, display)
     }
     return "level: —"
+  }
+
+  /// Maps linear RMS amplitude to a 0...1 bar value using a dB scale so the
+  /// meter responds across the range a human voice actually occupies (~-40
+  /// dBFS quiet to ~-10 dBFS loud), not just the bottom 20% of the bar that a
+  /// raw linear plot of RMS would show.
+  private func displayLevel(rms: Float) -> Double {
+    let safeRMS = max(Double(rms), 1e-6)
+    let dB = 20 * log10(safeRMS)
+    let normalized = (dB + 60) / 60 // -60 dBFS → 0, 0 dBFS → 1
+    return min(1, max(0, normalized))
   }
 
   private var transcriptBlock: some View {
