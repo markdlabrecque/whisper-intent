@@ -21,13 +21,13 @@ Use this file as a working checklist — tick boxes and paste observations inlin
 
 `DebugHelloIntent` and the spike harness screen ship in every configuration for now — they will be removed (or re-gated) before TestFlight in M6.
 
-- [ ] From the project root: `xed .` (or open `WhisperIntent.xcodeproj` directly).
-- [ ] Select the **WhisperIntent** scheme.
-- [ ] Set the run destination to your physical iPhone (not a simulator — Shortcuts/Siri/Action Button validation requires real hardware).
-- [ ] Use **Release** configuration if you also intend to run the S1 progress-callback harness in the same install (Debug skews ML perf). Either configuration is fine for S2 alone.
-- [ ] Build & Run (⌘R). Wait for the app to launch on device.
-- [ ] Verify `RootView` appears and the spike harness screen is reachable.
-- [ ] Stop the app from Xcode but leave it installed on the device.
+- [X] From the project root: `xed .` (or open `WhisperIntent.xcodeproj` directly).
+- [X] Select the **WhisperIntent** scheme.
+- [X] Set the run destination to your physical iPhone (not a simulator — Shortcuts/Siri/Action Button validation requires real hardware).
+- [X] Use **Release** configuration if you also intend to run the S1 progress-callback harness in the same install (Debug skews ML perf). Either configuration is fine for S2 alone.
+- [X] Build & Run (⌘R). Wait for the app to launch on device.
+- [X] Verify `RootView` appears and the spike harness screen is reachable.
+- [X] Stop the app from Xcode but leave it installed on the device.
 
 **Observed app version / build:** `___________`
 
@@ -67,8 +67,8 @@ For each surface below: run with `showUI = true`, then with `showUI = false`, th
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` | ☐ pass ☐ fail | |
-| `showUI = false` | ☐ pass ☐ fail | |
+| `showUI = true` | ☐ pass ☐ fail | pass |
+| `showUI = false` | ☐ pass ☐ fail | fail |
 
 ### 3.2 Siri voice phrase
 
@@ -79,10 +79,10 @@ For each surface below: run with `showUI = true`, then with `showUI = false`, th
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` (unlocked) | X pass ☐ fail | |
-| `showUI = false` (unlocked) | ☐ pass X fail | |
-| `showUI = true` (locked) | X pass ☐ fail | |
-| `showUI = false` (locked) | ☐ pass X fail | |
+| `showUI = true` (unlocked) | X pass ☐ fail | pass |
+| `showUI = false` (unlocked) | ☐ pass X fail | fail |
+| `showUI = true` (locked) | X pass ☐ fail | pass |
+| `showUI = false` (locked) | ☐ pass X fail | fail |
 
 ### 3.3 Action Button (iPhone 15 Pro+ only)
 
@@ -94,8 +94,8 @@ Skip and mark N/A if the test device doesn't have an Action Button.
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` | X pass ☐ fail ☐ N/A | |
-| `showUI = false` | X pass ☐ fail ☐ N/A | |
+| `showUI = true` | X pass ☐ fail ☐ N/A | pass |
+| `showUI = false` | X pass ☐ fail ☐ N/A | pass |
 
 ### 3.4 Home-screen Shortcut icon
 
@@ -105,8 +105,8 @@ Skip and mark N/A if the test device doesn't have an Action Button.
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` | X pass ☐ fail | |
-| `showUI = false` | X pass ☐ fail | |
+| `showUI = true` | X pass ☐ fail | pass |
+| `showUI = false` | X pass ☐ fail | pass |
 
 ### 3.5 Lock-screen widget
 
@@ -117,8 +117,8 @@ Skip and mark N/A if the test device doesn't have an Action Button.
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` (locked) | X pass ☐ fail | |
-| `showUI = false` (locked) | X pass ☐ fail | |
+| `showUI = true` (locked) | X pass ☐ fail | pass |
+| `showUI = false` (locked) | X pass ☐ fail | pass |
 
 ### 3.6 Spotlight
 
@@ -128,8 +128,8 @@ Skip and mark N/A if the test device doesn't have an Action Button.
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` | X pass ☐ fail | |
-| `showUI = false` | X pass ☐ fail | |
+| `showUI = true` | X pass ☐ fail | pass |
+| `showUI = false` | X pass ☐ fail | pass |
 
 ### 3.7 Back Tap
 
@@ -139,8 +139,8 @@ Skip and mark N/A if the test device doesn't have an Action Button.
 
 | | Result | Notes |
 |---|---|---|
-| `showUI = true` | X pass ☐ fail | |
-| `showUI = false` | ☐ pass X fail | |
+| `showUI = true` | X pass ☐ fail | pass |
+| `showUI = false` | ☐ pass X fail | fail |
 
 ---
 
@@ -213,11 +213,11 @@ The recorded failures in §3.2 (`showUI = false` via Siri voice, locked + unlock
 
 Once §3–§6 are complete:
 
-- [ ] Transcribe the per-surface results into the table at §4 of `S2-foreground-escalation.md`.
-- [ ] Write §5 interpretation: does the API behave uniformly? Where does it break down? Do the broken surfaces matter for the v1 use case?
-- [ ] Make the §6 decision: **Option B confirmed** (single intent) or **Option A required** (two intents).
-- [ ] Update TDD §7.1, §7.2 to match.
-- [ ] If Option A: update PRD §5.1 (two-intent surface) and §6 (example Shortcuts wording).
+- [X] Transcribe the per-surface results into the table at §4 of `S2-foreground-escalation.md`.
+- [X] Write §5 interpretation: does the API behave uniformly? Where does it break down? Do the broken surfaces matter for the v1 use case?
+- [X] Make the §6 decision: **Option B confirmed** (single intent) or **Option A required** (two intents).
+- [X] Update TDD §7.1, §7.2 to match.
+- [X] If Option A: update PRD §5.1 (two-intent surface) and §6 (example Shortcuts wording).
 - [ ] Close GitHub issue #3 with a one-line summary of the decision.
 - [ ] Close GitHub issue #6 (M2 tracker) — both spikes are now done.
 

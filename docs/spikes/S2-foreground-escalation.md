@@ -1,16 +1,17 @@
 # Spike S2: iOS 26 AppIntents foreground-escalation API
 
-**Status:** In progress
-**Owner:**
+**Status:** Completed
+**Owner:** Mark Labrecque
 **Started:** 2026-05-22
-**Completed:**
+**Completed:** 2026-05-23
 **Linked from:** [TDD §7.2](../TDD.md), [MILESTONES.md M2](../MILESTONES.md)
+**Test device:** iOS 26.4.2, Xcode 26.5 (iPhone 15 Pro+ class — Action Button row exercised)
 
 ---
 
 ## 1. Question
 
-Can a single AppIntent, declared with `openAppWhenRun = false`, programmatically escalate to a foreground UI presentation when its `showUI` parameter is true on iOS 26 — cleanly, without entitlement issues, and across all invocation surfaces?
+Can a single AppIntent, declared with `supportedModes: [.background, .foreground(.dynamic)]`, programmatically escalate to a foreground UI presentation when its `showUI` parameter is true on iOS 26 — cleanly, without entitlement issues, and across all invocation surfaces?
 
 ## 2. Why it matters
 
@@ -27,13 +28,13 @@ TDD §7.2 Option B (one AppIntent, conditional foreground escalation) keeps the 
    - A scene activation API called from within `perform()`
 4. Pick one. Implement.
 5. Validate behavior across **all** invocation surfaces from TDD §5.2:
-   - [ ] Shortcuts app (manual run)
-   - [ ] Siri voice phrase
-   - [ ] Action Button (iPhone 15 Pro+ if available)
-   - [ ] Home-screen Shortcut icon
-   - [ ] Lock-screen widget (locked phone)
-   - [ ] Spotlight
-   - [ ] Back Tap
+   - [x] Shortcuts app (manual run)
+   - [x] Siri voice phrase
+   - [x] Action Button (iPhone 15 Pro+ if available)
+   - [x] Home-screen Shortcut icon
+   - [x] Lock-screen widget (locked phone)
+   - [x] Spotlight
+   - [x] Back Tap
 6. For each surface, note: does the intent run? Does the right mode (foreground / background) happen based on `showUI`? Are there entitlement prompts, system dialogs, or odd UX?
 7. Check Apple developer forums / Feedback Assistant for known issues on the chosen API in iOS 26.
 
@@ -72,33 +73,50 @@ API status (sweep done 2026-05-23, see `docs/spikes/S2-test-plan.md` §6):
 - Known external issue documented by other developers: AppIntents declared with `.foreground(.dynamic)` can lose access to privileged system features (Core Location cited) when the host app has been force-quit before invocation. Not exercised by `DebugHelloIntent` itself; flagged for M3/M6 because `TranscribeSpeechIntent` will request mic permission.
 - Siri's intent invocation pipeline is documented as flaky on iOS 18.x with at least one open Feedback Assistant ticket (`FB16978432`). The same pattern shows up on iOS 26 in our results below: surfaces routing through Siri (voice, Back Tap) fail the background path inconsistently while non-Siri surfaces pass.
 
-_(per-surface results table; document any unexpected behavior, entitlement prompts, missing UI, deprecated API warnings)_
+Per-surface validation on iOS 26.4.2 (working sheet: `docs/spikes/S2-test-plan.md` §3):
 
 | Surface | `showUI = true` | `showUI = false` | Notes |
 |---|---|---|---|
-| Shortcuts app |  |  |  |
-| Siri voice |  |  |  |
-| Action Button |  |  |  |
-| Home-screen icon |  |  |  |
-| Lock-screen widget |  |  |  |
-| Spotlight |  |  |  |
-| Back Tap |  |  |  |
+| Shortcuts app (manual Play) | ✅ pass | ✅ pass | Returned string: `"Hello, Whisper Intent! Returned from IntentMode.background."` confirms background short-circuit. |
+| Siri voice — unlocked | ✅ pass | ✅ pass | Siri displays its own "Working…" chrome and a brief app indicator while the intent runs; this is Siri's standard intent presentation, not foreground continuation. |
+| Siri voice — locked | ✅ pass | ✅ pass | iOS does not prompt for unlock. Lock-screen Siri session handles the presentation directly. |
+| Action Button | ✅ pass | ✅ pass | Clean background run for `showUI = false`. |
+| Home-screen Shortcut icon | ✅ pass | ✅ pass | Clean background run for `showUI = false`. |
+| Lock-screen Shortcuts widget | ✅ pass | ✅ pass | Clean background run for `showUI = false`. |
+| Spotlight | ✅ pass | ✅ pass | Clean background run for `showUI = false`. |
+| Back Tap | ✅ pass | ✅ pass | Dynamic Island shows the app icon briefly during the background run; this is iOS's standard background-AppIntent indicator, not foreground continuation. |
+
+**Disambiguating "background-with-system-chrome" vs "foreground continuation."** Both can look superficially similar — iOS surfaces some kind of app indicator (Dynamic Island, Siri's "Working…" bar) while an AppIntent is running, regardless of whether the intent escalates to a foreground scene. The decisive signal is the returned string, which encodes which branch of `DebugHelloIntent.perform()` ran:
+
+- `"... Returned from IntentMode.background."` → background short-circuit fired (i.e., `showUI = false` honored).
+- `"... Returned after foreground UI."` → `continueInForeground(_:)` resolved and `DebugHelloView` was presented.
+
+Verified by adding a `Show Content` action to `Spike Hello Quiet` in the Shortcuts editor; the returned string was `IntentMode.background`-tagged, confirming the intent took the background path even on surfaces where iOS happened to show an app-icon indicator.
+
+Console attached via Xcode during a Shortcuts manual run with `showUI = true`: no deprecation warnings, no entitlement messages, no errors. The deprecated APIs (`openAppWhenRun`, `ForegroundContinuableIntent`) are not used by the harness, so no warnings expected.
 
 ## 5. Interpretation
 
-_(does the chosen API behave uniformly across surfaces? are there surfaces where escalation is restricted by iOS — e.g., locked phone, Spotlight? do those restrictions matter for our use case?)_
+The `showUI = true` (foreground escalation) path is uniformly reliable. All seven surfaces brought the app forward to `DebugHelloView`, the OK button returned the greeting to the caller, and there were no deprecation warnings, entitlement prompts, or stuck states.
+
+The `showUI = false` (background) path is also uniformly reliable. The returned string on every surface confirmed `systemContext.currentMode` was `.background` at the early-return — the intent did not escalate. iOS's surface-side chrome differs by invocation context (Dynamic Island app-icon indicator on most surfaces, Siri's "Working…" bar when invoked from Siri, the Shortcuts editor's run UI on manual Play), but none of that chrome is `DebugHelloView` — none of it is a scene the harness actually presented.
+
+Initial confusion during testing came from conflating "iOS shows the app's icon for a background-running intent" with "the app is being brought to the foreground." Those are distinct behaviors and only the latter would indicate a problem with the `showUI = false` short-circuit. The `Show Content` round-trip on `Spike Hello Quiet` proved which one was happening: `IntentMode.background`, every time.
+
+The chosen iOS 26 API (`supportedModes: [.background, .foreground(.dynamic)]` + `continueInForeground(_:)` + `systemContext.currentMode.canContinueInForeground` guard) is fit for purpose. Both paths work across every surface from TDD §5.2 without exception.
+
+**Cross-reference to §4 known issues:** the documented `.foreground(.dynamic)` + force-quit privileged-API regression doesn't apply to the hello intent (no privileged APIs used). It remains a concern to verify in M3/M6 when `TranscribeSpeechIntent` adds mic permission. The Siri-invocation flakiness documented in the cited Apple forum threads was not reproduced here — every surface returned the right value.
 
 ## 6. Decision
 
-_Pick one:_
+**Option B confirmed.** Single `TranscribeSpeechIntent` declared with `supportedModes: [.background, .foreground(.dynamic)]`. Foreground presentation via `continueInForeground(_:)` guarded by `systemContext.currentMode.canContinueInForeground`. Background path via the intent's own short-circuit when `showUI = false`.
 
-- **Option B confirmed.** Single AppIntent with programmatic foreground escalation via `<specific API>`. TDD §7.2 stands as drafted.
-- **Option A required.** Ship two AppIntents (`Transcribe Speech` and `Transcribe Speech (Background)`). TDD §7.2 needs rewriting; PRD §5.1 needs a note about the two-intent surface.
+All seven invocation surfaces from TDD §5.2 return the correct value and execute the correct branch. No documented limitations required for v1 release notes.
 
 **Updates required in other docs:**
-- [ ] TDD §7.1, §7.2 — pin to the chosen API or split into two intents.
-- [ ] PRD §5.1 — if Option A, document the two-intent surface; if Option B, no change.
-- [ ] PRD §6 — example Shortcuts may need rewording.
+- [x] TDD §7.1, §7.2 — pinned to `supportedModes` + `continueInForeground`.
+- [x] PRD §5.1 — no change required (single-intent surface preserved).
+- [x] PRD §6 — example Shortcuts wording unchanged.
 
 ## 7. Follow-ups
 

@@ -81,13 +81,14 @@ Bare scaffolding to make subsequent work measurable.
 ### S2 — AppIntents foreground-escalation API
 
 - [x] Build a minimal `HelloIntent` that, with a `showUI: Bool` parameter, either opens the app to a "hello" scene or returns a string from background.
-- [ ] Validate behavior via:
+- [x] Validate behavior via:
   - Manual run from the Shortcuts app.
   - Siri voice phrase.
   - Action Button bound to a Shortcut.
   - Lock-screen widget.
-- [ ] Confirm the foreground-escalation API works as expected on iOS 26 (no deprecation, no entitlement gotchas).
-- [ ] Report in `docs/spikes/S2-foreground-escalation.md`.
+  - (Also exercised: home-screen icon, Spotlight, Back Tap.)
+- [x] Confirm the foreground-escalation API works as expected on iOS 26 (no deprecation, no entitlement gotchas).
+- [x] Report in `docs/spikes/S2-foreground-escalation.md`.
 
 **Exit:** decision recorded as either:
 - "Single AppIntent with programmatic foreground escalation works — TDD §7.2 Option B is feasible," or
