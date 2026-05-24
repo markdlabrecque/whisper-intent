@@ -5,9 +5,8 @@ import WhisperIntentCore
 /// the AppIntent's recording sheet if a session is active; otherwise the landing
 /// screen with onboarding link or settings. Implementation deferred to M5.
 struct RootView: View {
-  #if DEBUG
-    @State private var showSpikes = false
-  #endif
+  @StateObject private var environment = AppEnvironment.shared
+  @State private var showSpikes = false
 
   var body: some View {
     VStack(spacing: 24) {
@@ -17,17 +16,18 @@ struct RootView: View {
         .font(.footnote)
         .foregroundStyle(.secondary)
 
-      #if DEBUG
-        Button("Open spike harness") { showSpikes = true }
-          .buttonStyle(.borderedProminent)
-      #endif
+      Button("Open spike harness") { showSpikes = true }
+        .buttonStyle(.borderedProminent)
     }
     .padding()
-    #if DEBUG
-      .sheet(isPresented: $showSpikes) {
-        DebugSpikesView()
+    .sheet(isPresented: $showSpikes) {
+      DebugSpikesView()
+    }
+    .sheet(item: $environment.helloPresentation) { presentation in
+      DebugHelloView(presentation: presentation) {
+        environment.finishHelloSpike()
       }
-    #endif
+    }
   }
 }
 

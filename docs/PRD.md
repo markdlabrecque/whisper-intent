@@ -146,7 +146,7 @@ Once recording stops, WhisperKit needs time to transcribe. On a medium model wit
 
 When `Show UI = true`, the recording sheet transitions in place from the recording state (waveform + stop button) into a processing state (progress indicator) without dismissing — the user sees one continuous UI from "tap stop" through "transcript returned." When `Show UI = false`, no processing indicator is shown; the Shortcut just blocks on the AppIntent until the transcript is ready.
 
-**Determinate vs indeterminate:** v1 ships a **determinate** progress bar if WhisperKit exposes progress callbacks for the medium model with reasonable granularity (segment-level or finer). If only coarse phase callbacks are available (e.g., "loaded → decoding → done"), v1 ships an **indeterminate** spinner with phase labels and a true determinate bar moves to v2. Either way, *some* processing indicator is part of v1. The spike to confirm callback granularity is the first technical task before locking the UI design.
+**Decision (S1, 2026-05-23):** v1 ships an **indeterminate** spinner with phase labels. WhisperKit's callbacks are frequent enough to prove the app is actively working, but they do not expose a reliable total-work denominator for an honest determinate 0...1 progress bar. A determinate bar remains a v2 candidate if a future WhisperKit API or deeper adapter work exposes trustworthy progress fractions.
 
 ### 5.7 Permissions
 
@@ -224,7 +224,7 @@ Listed in rough priority order, no commitments:
 
 ## 10. Open Questions
 
-- **Progress bar fidelity:** progress indicator is locked in for v1, but determinate vs indeterminate depends on WhisperKit's progress callback granularity for the medium model. Needs a spike before UI design is finalized.
+- ~~**Progress bar fidelity:** progress indicator is locked in for v1, but determinate vs indeterminate depends on WhisperKit's progress callback granularity for the medium model. Needs a spike before UI design is finalized.~~ **Resolved 2026-05-23.** S1 chose an indeterminate spinner with phase labels for v1; determinate progress remains a v2 candidate.
 - **Bundle size impact on conversion:** the medium WhisperKit model adds ~1.5 GB to install size (exact number pending S4). Bundling vs ODR is decided (bundling — TDD §6.1), and S4 will validate the numbers. The remaining question is purely empirical: does the download size deter App Store installs? Only answerable post-launch via App Store Connect conversion data. Carried into post-launch monitoring rather than gating v1.
 - **Background behavior:** if iOS suspends the app mid-recording (e.g., user switches away during a long capture), does the recording survive? v1 acceptable answer is "recording ends cleanly and returns whatever was captured." Needs validation.
 - ~~**App name conflicts:** confirm "Whisper Intent" doesn't collide with existing App Store apps or trademarks.~~ **Resolved 2026-05-22.** No App Store collision. OpenAI holds a USPTO trademark on `WHISPER` covering speech-recognition software; shipping as "Whisper Intent" anyway, accepting the same posture WhisperKit operates under. See MILESTONES.md cross-cutting tracks for full reasoning.

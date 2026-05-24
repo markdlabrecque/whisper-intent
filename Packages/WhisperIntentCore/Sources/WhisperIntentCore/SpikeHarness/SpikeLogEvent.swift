@@ -18,6 +18,7 @@ public struct SpikeLogEvent: Sendable, Identifiable {
     case progress // WhisperKit's per-token progress callback
     case segmentDiscovered // WhisperKit's segmentDiscoveryCallback
     case transcribeEnd
+    case metrics
     case harnessError
   }
 
@@ -42,6 +43,8 @@ public extension SpikeLogEvent {
   /// Single-line text rendering used by the on-device log view and the dump
   /// file written to Documents/.
   var logLine: String {
-    String(format: "%7.3fs  %-22s  %@", elapsed, kind.rawValue, summary)
+    let elapsedText = String(format: "%7.3fs", elapsed)
+    let kindText = kind.rawValue.padding(toLength: 22, withPad: " ", startingAt: 0)
+    return "\(elapsedText)  \(kindText)  \(summary)"
   }
 }

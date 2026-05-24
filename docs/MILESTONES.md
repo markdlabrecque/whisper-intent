@@ -69,10 +69,10 @@ Bare scaffolding to make subsequent work measurable.
 
 ### S1 — Progress callback granularity
 
-- [ ] Build a minimal command-line-ish harness inside the app: load WhisperKit medium, transcribe a bundled 30-second sample, log every progress callback with timestamp + payload.
-- [ ] Repeat with a bundled 5-minute sample to check whether granularity degrades on longer inputs.
-- [ ] Capture: callback frequency, payload structure, whether segment indices are exposed.
-- [ ] Report in `docs/spikes/S1-progress-callbacks.md`.
+- [x] Build a minimal command-line-ish harness inside the app: load WhisperKit medium, transcribe a bundled 30-second sample, log every progress callback with timestamp + payload.
+- [x] Repeat with a bundled 5-minute sample to check whether granularity degrades on longer inputs.
+- [x] Capture: callback frequency, payload structure, whether segment indices are exposed.
+- [x] Report in `docs/spikes/S1-progress-callbacks.md`.
 
 **Exit:** decision recorded as either:
 - "Determinate progress bar in v1, driven by `<specific signal>`," or
@@ -80,14 +80,15 @@ Bare scaffolding to make subsequent work measurable.
 
 ### S2 — AppIntents foreground-escalation API
 
-- [ ] Build a minimal `HelloIntent` that, with a `showUI: Bool` parameter, either opens the app to a "hello" scene or returns a string from background.
-- [ ] Validate behavior via:
+- [x] Build a minimal `HelloIntent` that, with a `showUI: Bool` parameter, either opens the app to a "hello" scene or returns a string from background.
+- [x] Validate behavior via:
   - Manual run from the Shortcuts app.
   - Siri voice phrase.
   - Action Button bound to a Shortcut.
   - Lock-screen widget.
-- [ ] Confirm the foreground-escalation API works as expected on iOS 26 (no deprecation, no entitlement gotchas).
-- [ ] Report in `docs/spikes/S2-foreground-escalation.md`.
+  - (Also exercised: home-screen icon, Spotlight, Back Tap.)
+- [x] Confirm the foreground-escalation API works as expected on iOS 26 (no deprecation, no entitlement gotchas).
+- [x] Report in `docs/spikes/S2-foreground-escalation.md`.
 
 **Exit:** decision recorded as either:
 - "Single AppIntent with programmatic foreground escalation works — TDD §7.2 Option B is feasible," or
