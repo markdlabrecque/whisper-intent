@@ -25,6 +25,9 @@ build/
 *.profraw
 *.profdata
 
+# Local spike/runtime logs
+logs/
+
 # App build artifacts
 *.ipa
 *.dSYM.zip

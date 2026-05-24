@@ -151,31 +151,26 @@ final class WhisperKitTranscriber {
 - After model is loaded once in the process, subsequent transcriptions reuse it — no reload cost on repeated invocations within the same app lifetime.
 - WhisperKit is called with `language: "en"`, `task: .transcribe`. Multilingual is a v2 feature.
 
-### 6.3 Progress callbacks — the spike
+### 6.3 Progress callbacks
 
-WhisperKit exposes progress via `TranscriptionCallback` on its decoder loop. **Open question: granularity of these callbacks on the medium model with a long input.**
+WhisperKit exposes progress via `TranscriptionCallback` on its decoder loop.
 
-The spike (first technical task):
-- Build a minimal harness that transcribes a 30-second sample using WhisperKit medium and logs every progress callback.
-- Measure: callback frequency (Hz), what information each callback carries (decoded segment count? token position? wall-clock elapsed?), and whether granularity degrades on longer inputs.
-- **If callbacks fire at segment granularity (every few seconds) or finer:** v1 ships a determinate progress bar driven by `segments_done / estimated_total_segments`.
-- **If callbacks are only coarse phase transitions (`encoding done`, `decoding done`):** v1 ships an indeterminate spinner with phase labels ("Listening...", "Transcribing...").
+**Decision (S1, 2026-05-23):** v1 ships an indeterminate spinner with phase labels. The S1 harness measured frequent progress callbacks (~25 Hz) on both short and longer synthetic samples, with no cadence degradation on longer input. However, the callback payload (`tokens.count`, `windowId`) does not expose a stable total-work denominator for a truthful 0...1 progress bar. Segment-discovery callbacks are much coarser and are also not suitable for smooth determinate progress.
 
-Per PRD §5.6, *some* progress indicator ships in v1 either way. The spike only decides which.
+The UI still gets useful phase updates: starting, encoding, decoding, and finishing. A determinate bar remains a v2 candidate if a future WhisperKit API or adapter change exposes trustworthy progress fractions.
 
 `TranscriptionProgress` is the abstraction over this:
 
 ```swift
 public enum TranscriptionProgress: Sendable, Equatable {
     case starting
-    case progress(fraction: Double, phase: Phase)   // determinate path
-    case phase(Phase)                                // indeterminate path
+    case phase(Phase)
     case finishing
     public enum Phase: String, Sendable { case encoding, decoding }
 }
 ```
 
-UI binds to this enum and renders either a `ProgressView(value:)` or a spinner based on the case.
+UI binds to this enum and renders a spinner with the current phase label.
 
 ## 7. AppIntent design
 

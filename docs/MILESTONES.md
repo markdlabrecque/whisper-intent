@@ -69,10 +69,10 @@ Bare scaffolding to make subsequent work measurable.
 
 ### S1 — Progress callback granularity
 
-- [ ] Build a minimal command-line-ish harness inside the app: load WhisperKit medium, transcribe a bundled 30-second sample, log every progress callback with timestamp + payload.
-- [ ] Repeat with a bundled 5-minute sample to check whether granularity degrades on longer inputs.
-- [ ] Capture: callback frequency, payload structure, whether segment indices are exposed.
-- [ ] Report in `docs/spikes/S1-progress-callbacks.md`.
+- [x] Build a minimal command-line-ish harness inside the app: load WhisperKit medium, transcribe a bundled 30-second sample, log every progress callback with timestamp + payload.
+- [x] Repeat with a bundled 5-minute sample to check whether granularity degrades on longer inputs.
+- [x] Capture: callback frequency, payload structure, whether segment indices are exposed.
+- [x] Report in `docs/spikes/S1-progress-callbacks.md`.
 
 **Exit:** decision recorded as either:
 - "Determinate progress bar in v1, driven by `<specific signal>`," or
@@ -80,7 +80,7 @@ Bare scaffolding to make subsequent work measurable.
 
 ### S2 — AppIntents foreground-escalation API
 
-- [ ] Build a minimal `HelloIntent` that, with a `showUI: Bool` parameter, either opens the app to a "hello" scene or returns a string from background.
+- [x] Build a minimal `HelloIntent` that, with a `showUI: Bool` parameter, either opens the app to a "hello" scene or returns a string from background.
 - [ ] Validate behavior via:
   - Manual run from the Shortcuts app.
   - Siri voice phrase.

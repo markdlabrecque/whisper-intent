@@ -2,7 +2,7 @@
 
 PROJECT := WhisperIntent.xcodeproj
 SCHEME  := WhisperIntent
-DESTINATION := platform=iOS Simulator,name=iPhone 15
+DESTINATION ?= generic/platform=iOS Simulator
 
 generate:
 	xcodegen generate

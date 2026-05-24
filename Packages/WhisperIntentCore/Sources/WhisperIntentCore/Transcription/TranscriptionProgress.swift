@@ -1,14 +1,11 @@
 import Foundation
 
 /// Progress reported by `WhisperKitTranscriber` during transcription.
-///
-/// The exact case used by v1 (`.progress(...)` for determinate, or `.phase(_:)` for
-/// indeterminate) is decided by spike S1. Both cases are declared here so the rest of
-/// the code compiles regardless of the outcome; the unused case will be deleted when S1
-/// closes. See `docs/spikes/S1-progress-callbacks.md`.
+/// Spike S1 resolved v1 to an indeterminate spinner with phase labels: WhisperKit
+/// emits frequent callbacks, but not a stable total-work denominator for a truthful
+/// 0...1 progress bar. See `docs/spikes/S1-progress-callbacks.md`.
 public enum TranscriptionProgress: Sendable, Equatable {
   case starting
-  case progress(fraction: Double, phase: Phase)
   case phase(Phase)
   case finishing
 
