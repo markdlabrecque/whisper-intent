@@ -7,7 +7,10 @@ import WhisperIntentCore
 final class AppEnvironment: ObservableObject {
   static let shared = AppEnvironment()
 
-  let session = TranscriptionSession()
+  let session = TranscriptionSession(
+    recorder: AudioRecorder(),
+    transcriber: WhisperKitTranscriber()
+  )
 
   /// Spike S2 harness state — remove (or re-gate) before TestFlight in M6.
   @Published var helloPresentation: DebugHelloPresentation?

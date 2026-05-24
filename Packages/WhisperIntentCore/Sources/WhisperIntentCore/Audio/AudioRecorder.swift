@@ -1,12 +1,28 @@
 import Foundation
 
-/// Wraps `AVAudioEngine` for 16 kHz mono PCM capture, with route/interruption handling.
-/// Implementation deferred to M3. See `docs/TDD.md` §5.1.
-final class AudioRecorder: Sendable {
-  // Intentionally empty in M0. M3 implements:
-  //   - AVAudioEngine setup with .measurement mode
-  //   - 16 kHz mono Float32 tap
-  //   - max-duration timer (from RecordingConfig.maxDuration)
-  //   - interruption + route-change handling
-  //   - os_proc_available_memory() safety net
+/// Production `AudioRecording` over `AVAudioEngine`. Conforms to the protocol so
+/// `AppEnvironment` can wire a session today; the real engine + tap implementation
+/// lands in a follow-on M3 commit. See `docs/TDD.md` §5.1.
+public final class AudioRecorder: AudioRecording {
+  public init() {}
+
+  public func start(
+    maxDuration _: TimeInterval,
+    buffers _: @Sendable @escaping ([Float]) -> Void,
+    level _: @Sendable @escaping (Float) -> Void
+  ) async throws {
+    throw SessionError.transcriptionFailed(
+      underlying: "AudioRecorder.start unimplemented — pending follow-on M3 commit."
+    )
+  }
+
+  public func stop() async throws -> [Float] {
+    throw SessionError.transcriptionFailed(
+      underlying: "AudioRecorder.stop unimplemented — pending follow-on M3 commit."
+    )
+  }
+
+  public func cancel() async {
+    // No-op until the real engine lands.
+  }
 }

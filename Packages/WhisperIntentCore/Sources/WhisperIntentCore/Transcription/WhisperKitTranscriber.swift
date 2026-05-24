@@ -1,11 +1,18 @@
 import Foundation
 
-/// Adapter over the WhisperKit library. Loads the bundled medium model and runs
-/// transcription on captured PCM. Implementation deferred to M3.
+/// Production `Transcribing` over WhisperKit. Conforms to the protocol so
+/// `AppEnvironment` can wire a session today; the real model-load + transcribe
+/// implementation will be lifted from `SpikeS1Harness` in a follow-on M3 commit.
 /// See `docs/TDD.md` §6.
-final class WhisperKitTranscriber: Sendable {
-  // Intentionally empty in M0. M3 implements:
-  //   - lazy model load from Resources/Models/openai_whisper-medium/
-  //   - transcribe([Float]) async throws -> String with progress callback
-  //   - emit `TranscriptionProgress` updates with shape decided by spike S1
+public final class WhisperKitTranscriber: Transcribing {
+  public init() {}
+
+  public func transcribe(
+    audio _: [Float],
+    progress _: @Sendable @escaping (TranscriptionProgress) -> Void
+  ) async throws -> String {
+    throw SessionError.transcriptionFailed(
+      underlying: "WhisperKitTranscriber.transcribe unimplemented — pending follow-on M3 commit."
+    )
+  }
 }
