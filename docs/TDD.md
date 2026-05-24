@@ -195,7 +195,9 @@ struct TranscribeSpeechIntent: AppIntent {
     @Parameter(title: "Prompt", default: nil)
     var prompt: String?
 
-    static var openAppWhenRun: Bool { false }   // see §7.2
+    // iOS 26: openAppWhenRun is deprecated; foreground escalation is expressed via
+    // `supportedModes` + `continueInForeground(_:)`. See §7.2.
+    static let supportedModes: IntentModes = [.background, .foreground(.dynamic)]
 
     @MainActor
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
@@ -219,12 +221,12 @@ struct TranscribeSpeechIntent: AppIntent {
 
 ### 7.2 Foreground vs background execution
 
-The PRD requires both modes (`Show UI = true/false`). AppIntents in iOS 26 distinguish them via `openAppWhenRun`, but that's a static property. Two options:
+The PRD requires both modes (`Show UI = true/false`). In iOS 26 the AppIntents API for this is `supportedModes: IntentModes` combined with `continueInForeground(_:)` — `openAppWhenRun` and `ForegroundContinuableIntent` are deprecated with explicit migration guidance pointing at the new path. Two options:
 
-- **Option A:** Two AppIntent types, one with `openAppWhenRun = true` (foreground), one with `false` (background). Shortcuts user picks the one they want.
-- **Option B (chosen):** One AppIntent with `openAppWhenRun = false`. When `showUI = true`, the intent uses `ContinueInAppIntent` (or equivalent iOS 26 API) to programmatically open the app to its recording scene; when `false`, it runs entirely in the extension's background context.
+- **Option A:** Two AppIntent types, one declared with `.foreground(.immediate)` only and one with `.background` only. Shortcuts user picks the one they want.
+- **Option B (chosen):** One AppIntent declared with `supportedModes: [.background, .foreground(.dynamic)]`. When `showUI = true`, the intent calls `continueInForeground(_:)` (guarded by `systemContext.currentMode.canContinueInForeground`) to bring the app forward to its recording scene; when `false`, `perform()` returns from the background context without escalation.
 
-Option B keeps the Shortcuts surface clean (one step, configurable) and matches the PRD's "single step in the Shortcut" requirement. The cost is more careful lifecycle handling — the spike on iOS 26 AppIntents API for programmatic foreground escalation is the second technical task.
+Option B keeps the Shortcuts surface clean (one step, configurable) and matches the PRD's "single step in the Shortcut" requirement. Spike S2 validated the API choice on iOS 26.4.2 — see `docs/spikes/S2-foreground-escalation.md` for per-surface results, including a known limitation that surfaces routing through Siri's intent invocation pipeline (Siri voice, Back Tap) behave inconsistently for the background path even when the same Shortcut runs cleanly from Shortcuts manual run. That's an iOS-side constraint, not an API misuse — Option B remains the chosen approach.
 
 ### 7.3 Background execution constraints and the max-duration cap
 
@@ -295,6 +297,8 @@ Reads/writes `UserDefaults`:
 - `microphoneStatus()` and `requestMicrophone()` wrap `AVAudioApplication.shared.recordPermission` / `requestRecordPermission`.
 - Called by `TranscriptionSession.startRecording`; throws `SessionError.permissionDenied` if status is `.denied` or `.undetermined` cannot be resolved (the latter only happens if background context can't show a prompt — see §7.3).
 - The app's first-run onboarding screen prompts the user to run the intent once in foreground, ensuring permission is granted before any background invocation is attempted.
+
+**Force-quit caveat (iOS 26):** AppIntents declared with `supportedModes` that include `.foreground(.dynamic)` have been reported to lose access to privileged system features (Core Location is the documented example) when the host app has been force-closed before invocation. Mic permission is the v1 equivalent risk. Verify during M6 hardening that a `showUI = false` invocation after a fresh force-quit either succeeds or fails cleanly with `SessionError.permissionDenied` — not a silent hang or generic Siri error. Source: spike S2 sweep, `docs/spikes/S2-foreground-escalation.md` §4.
 
 ## 10. Memory & performance budget
 
