@@ -38,7 +38,7 @@ The `DebugRecordingView` requests microphone permission lazily on the first tap 
 - [ ] Tap **Open spike harness** from `RootView`.
 - [ ] Tap **Open recording harness** in the M3 section.
 - [ ] Confirm the State shows `idle`, mic-permission line shows `undetermined`.
-- [ ] Tap **Start recording**. iOS should show the standard "Whisper Intent" Would Like to Access the Microphone" prompt with the description "Whisper Intent records your voice when an Apple Shortcut calls the Transcribe Speech action. Audio stays on your iPhone."
+- [ ] Tap **Start recording**. iOS should show a permission alert. The heading reads `"Whisper Intent" Would Like to Access the Microphone` (supplied by iOS). The body underneath comes from `App/WhisperIntent/Info.plist` (key `NSMicrophoneUsageDescription`) and should read **exactly**: "Whisper Intent records your voice when an Apple Shortcut calls the Transcribe Speech action. Audio stays on your iPhone."
 - [ ] Tap **Allow**.
 - [ ] Mic-permission line should update to `granted`. State should transition to `recording`. Level bar should start moving.
 
