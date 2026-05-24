@@ -52,6 +52,24 @@ The app doesn't ship these — they're illustrations of patterns you can build y
 1. `Transcribe Speech` (Show UI = on)
 2. `Get contents of URL` → POST to your endpoint with the transcript as the body
 
+**Dictate a Text Message**
+1. `Transcribe Speech` (Show UI = on, Prompt = "Message to Alex")
+2. `Send Message` → recipient: Alex, body: *Transcribed Text*
+
+**Voice Calendar Event**
+1. `Transcribe Speech` (Prompt = "What's the event?")
+2. `Add New Event` → title: *Transcribed Text*, prompt for date
+
+**Voice Search / Translate**
+1. `Transcribe Speech` (Show UI = off)
+2. `Translate Text` (or `Search Web`) → input: *Transcribed Text*
+3. `Show Result` (or `Speak Text`)
+
+**Dictate to an AI**
+1. `Transcribe Speech` (Show UI = on, Prompt = "Ask ChatGPT")
+2. Your AI app's `Ask` action (Claude, ChatGPT, etc.) → input: *Transcribed Text*
+3. `Show Result` or pipe into another step
+
 Trigger any of these from Siri ("Hey Siri, quick reminder"), the Action Button, a lock-screen widget, or any other Shortcuts surface. Whisper Intent doesn't need to be open — iOS launches it on demand.
 
 ## Privacy
