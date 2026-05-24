@@ -12,7 +12,7 @@ let package = Package(
     // macOS is declared only so `swift build` / `swift test` work on developer
     // machines and CI runners; the macOS minimum tracks WhisperKit's requirement.
     .iOS("26.0"),
-    .macOS("13.0")
+    .macOS("14.0")
   ],
   products: [
     .library(
