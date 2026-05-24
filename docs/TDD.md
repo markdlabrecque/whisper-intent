@@ -133,7 +133,7 @@ The medium model (~1.5 GB on disk) is bundled in `Resources/Models/`. Two delive
 - **Option A (preferred):** ship as part of the main app bundle. Adds ~1.5 GB to install size.
 - **Option B (fallback):** ship via On-Demand Resources (ODR). Smaller install footprint, but model is downloaded after first launch — contradicts the "no first-run download" PRD goal.
 
-**Decision (confirmed by spike S4, 2026-05-22):** Option A. Local fat IPA measured at 1.35 GB; signed `.app` bundle 1.4 GB. The PRD's "no first-run download" requirement and the realities of Shortcuts users wiring up an automation only to have it fail because the model isn't downloaded yet make ODR a poor fit. If thinned App Store numbers at M6 come in dramatically worse than expected, the fallback is a smaller model variant — not ODR. See [docs/spikes/S4-install-size.md](spikes/S4-install-size.md).
+**Decision (confirmed by spike S4, 2026-05-22):** Option A. Local fat IPA measured at 1.35 GB; signed `.app` bundle 1.4 GB. The PRD's "no first-run download" requirement and the realities of Shortcuts users wiring up an automation only to have it fail because the model isn't downloaded yet make ODR a poor fit. If thinned App Store numbers at M6 come in dramatically worse than expected, the fallback is a smaller model variant — not ODR. See [docs/spike-decisions.md § S4](spike-decisions.md).
 
 Model files (Core ML `.mlmodelc` directories for encoder + decoder + tokenizer JSON) live under `Resources/Models/openai_whisper-medium/`. Verified at app launch — if files are missing or corrupted, app shows an error and refuses to start (this is a build/packaging error, not a user-recoverable state).
 
@@ -226,7 +226,7 @@ The PRD requires both modes (`Show UI = true/false`). In iOS 26 the AppIntents A
 - **Option A:** Two AppIntent types, one declared with `.foreground(.immediate)` only and one with `.background` only. Shortcuts user picks the one they want.
 - **Option B (chosen):** One AppIntent declared with `supportedModes: [.background, .foreground(.dynamic)]`. When `showUI = true`, the intent calls `continueInForeground(_:)` (guarded by `systemContext.currentMode.canContinueInForeground`) to bring the app forward to its recording scene; when `false`, `perform()` returns from the background context without escalation.
 
-Option B keeps the Shortcuts surface clean (one step, configurable) and matches the PRD's "single step in the Shortcut" requirement. Spike S2 validated the API choice on iOS 26.4.2 — see `docs/spikes/S2-foreground-escalation.md` for per-surface results, including a known limitation that surfaces routing through Siri's intent invocation pipeline (Siri voice, Back Tap) behave inconsistently for the background path even when the same Shortcut runs cleanly from Shortcuts manual run. That's an iOS-side constraint, not an API misuse — Option B remains the chosen approach.
+Option B keeps the Shortcuts surface clean (one step, configurable) and matches the PRD's "single step in the Shortcut" requirement. Spike S2 validated the API choice on iOS 26.4.2 — see `docs/spike-decisions.md § S2` for per-surface results, including a known limitation that surfaces routing through Siri's intent invocation pipeline (Siri voice, Back Tap) behave inconsistently for the background path even when the same Shortcut runs cleanly from Shortcuts manual run. That's an iOS-side constraint, not an API misuse — Option B remains the chosen approach.
 
 ### 7.3 Background execution constraints and the max-duration cap
 
@@ -298,7 +298,7 @@ Reads/writes `UserDefaults`:
 - Called by `TranscriptionSession.startRecording`; throws `SessionError.permissionDenied` if status is `.denied` or `.undetermined` cannot be resolved (the latter only happens if background context can't show a prompt — see §7.3).
 - The app's first-run onboarding screen prompts the user to run the intent once in foreground, ensuring permission is granted before any background invocation is attempted.
 
-**Force-quit caveat (iOS 26):** AppIntents declared with `supportedModes` that include `.foreground(.dynamic)` have been reported to lose access to privileged system features (Core Location is the documented example) when the host app has been force-closed before invocation. Mic permission is the v1 equivalent risk. Verify during M6 hardening that a `showUI = false` invocation after a fresh force-quit either succeeds or fails cleanly with `SessionError.permissionDenied` — not a silent hang or generic Siri error. Source: spike S2 sweep, `docs/spikes/S2-foreground-escalation.md` §4.
+**Force-quit caveat (iOS 26):** AppIntents declared with `supportedModes` that include `.foreground(.dynamic)` have been reported to lose access to privileged system features (Core Location is the documented example) when the host app has been force-closed before invocation. Mic permission is the v1 equivalent risk. Verify during M6 hardening that a `showUI = false` invocation after a fresh force-quit either succeeds or fails cleanly with `SessionError.permissionDenied` — not a silent hang or generic Siri error. Source: spike S2 sweep, `docs/spike-decisions.md § S2` §4.
 
 ## 10. Memory & performance budget
 
@@ -359,7 +359,7 @@ These are the explicit "answer this before implementing" tasks:
 3. **Background execution budget for `showUI = false`** (§7.3). Determines the value of the max-duration cap baked into v1. This is a load-bearing spike — the chosen number drives App Store description, AppIntent description, onboarding copy, and the recording UI's warning thresholds (PRD §5.4.1). Run on the lowest-spec supported device (iPhone with A-series chip oldest still on iOS 26) to avoid setting a cap that fails on older hardware.
 4. **WhisperKit medium install size on a real device** (§6.1). Confirms install-size cost; informs whether ODR fallback is worth keeping as a backup plan.
 
-Each spike produces a short note in `docs/spikes/` documenting findings; the TDD is updated based on what's learned.
+Each spike's working document lives in `docs/spikes/` while it's open; once a decision is recorded, the entry is collapsed into [docs/spike-decisions.md](spike-decisions.md) and the per-spike file is removed. The TDD is updated based on what's learned.
 
 ## 14. Open questions deferred from PRD
 

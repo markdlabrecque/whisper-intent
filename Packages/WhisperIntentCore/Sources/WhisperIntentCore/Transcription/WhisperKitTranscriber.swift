@@ -5,7 +5,7 @@ import Foundation
 /// first use, then reuses it for subsequent calls in the same process.
 ///
 /// Progress is emitted as the indeterminate-phase shape decided by spike S1
-/// (`docs/spikes/S1-progress-callbacks.md`): `.starting` is emitted by
+/// (`docs/spike-decisions.md § S1`): `.starting` is emitted by
 /// `TranscriptionSession` before calling here; this transcriber emits
 /// `.phase(.encoding)` once the model is ready and the transcribe loop begins,
 /// then `.phase(.decoding)` on the first per-token progress callback, then

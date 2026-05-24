@@ -37,7 +37,7 @@ Bare scaffolding to make subsequent work measurable.
 - [x] iOS 26 deployment target, Swift 6 strict concurrency on.
 - [x] WhisperKit dependency added, pinned version. _(0.18.0, exact pin.)_
 - [x] CI pipeline (GitHub Actions): build + test on every push. _(`.github/workflows/ci.yml`. App-target job commented out until GitHub runners ship Xcode 26.)_
-- [x] `docs/spikes/` directory created with a template for spike reports.
+- [x] `docs/spikes/` directory created with a template for spike reports. Closed-spike findings are consolidated into [docs/spike-decisions.md](spike-decisions.md); per-spike files exist only while a spike is in progress.
 - [x] App icon placeholder, bundle ID registered. _(Bundle ID `com.marklabrecque.whisperintent` registered with Apple Developer. App icon directory exists; real icon to be added before M6.)_
 - [ ] ~~App Store Connect record created.~~ **Deferred to M6.** Not needed until TestFlight uploads start. Reopening at M6.
 
@@ -55,7 +55,7 @@ Bare scaffolding to make subsequent work measurable.
 - [ ] Build a release IPA.
 - [ ] Measure on-device install size on a real iPhone (iOS 26).
 - [ ] Compare against App Store Connect's reported download size after a TestFlight build.
-- [ ] Report in `docs/spikes/S4-install-size.md`.
+- [x] Report consolidated into [docs/spike-decisions.md § S4](spike-decisions.md).
 
 **Exit:** documented install size with two numbers (uncompressed app bundle, App Store download size). Decision recorded: stick with bundled (TDD §6.1 Option A) or fall back to ODR.
 
@@ -72,7 +72,7 @@ Bare scaffolding to make subsequent work measurable.
 - [x] Build a minimal command-line-ish harness inside the app: load WhisperKit medium, transcribe a bundled 30-second sample, log every progress callback with timestamp + payload.
 - [x] Repeat with a bundled 5-minute sample to check whether granularity degrades on longer inputs.
 - [x] Capture: callback frequency, payload structure, whether segment indices are exposed.
-- [x] Report in `docs/spikes/S1-progress-callbacks.md`.
+- [x] Report consolidated into [docs/spike-decisions.md § S1](spike-decisions.md).
 
 **Exit:** decision recorded as either:
 - "Determinate progress bar in v1, driven by `<specific signal>`," or
@@ -88,7 +88,7 @@ Bare scaffolding to make subsequent work measurable.
   - Lock-screen widget.
   - (Also exercised: home-screen icon, Spotlight, Back Tap.)
 - [x] Confirm the foreground-escalation API works as expected on iOS 26 (no deprecation, no entitlement gotchas).
-- [x] Report in `docs/spikes/S2-foreground-escalation.md`.
+- [x] Report consolidated into [docs/spike-decisions.md § S2](spike-decisions.md).
 
 **Exit:** decision recorded as either:
 - "Single AppIntent with programmatic foreground escalation works — TDD §7.2 Option B is feasible," or

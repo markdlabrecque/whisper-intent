@@ -9,25 +9,25 @@ Tick boxes inline as you go. Paste console excerpts and transcripts where the do
 
 ## 0. Prerequisites
 
-- [ ] iPhone running iOS 26.x available (note exact version: `___________`).
-- [ ] Mac running Xcode 26.x (note exact version: `___________`).
-- [ ] Device paired to Xcode, developer mode enabled, signed in with a provisioning-capable Apple ID.
-- [ ] AirPods or other Bluetooth headphones available (used in §4 route-loss test). Optional; mark §4 N/A if unavailable.
-- [ ] A second phone (or VoIP service) available to call this device (used in §3 interruption test). Optional; mark §3 N/A if unavailable.
-- [ ] Branch `develop` checked out locally with the M3 commits merged in. (`git log --oneline -5 develop` should show the AudioRecorder + debug-recording-view commits.)
+- [X] iPhone running iOS 26.x available (note exact version: `26.4.2`).
+- [X] Mac running Xcode 26.x (note exact version: `26.5`).
+- [X] Device paired to Xcode, developer mode enabled, signed in with a provisioning-capable Apple ID.
+- [X] AirPods or other Bluetooth headphones available (used in §4 route-loss test). Optional; mark §4 N/A if unavailable.
+- [n/a] A second phone (or VoIP service) available to call this device (used in §3 interruption test). Optional; mark §3 N/A if unavailable.
+- [X] Branch `develop` checked out locally with the M3 commits merged in. (`git log --oneline -5 develop` should show the AudioRecorder + debug-recording-view commits.)
 
 ---
 
 ## 1. Build & install
 
-- [ ] From the project root: `make generate` to regenerate `WhisperIntent.xcodeproj` from `project.yml` (picks up any new files added to `App/WhisperIntent/`).
-- [ ] Open `WhisperIntent.xcodeproj` (`xed .` or double-click).
-- [ ] Select the **WhisperIntent** scheme. Pick **Release** as the build configuration (Debug skews ML perf and we want representative timing).
-- [ ] Set the run destination to your physical iPhone.
-- [ ] Build & Run (⌘R). Wait for first launch on device.
-- [ ] Verify `RootView` appears: `Whisper Intent` title + the `Open spike harness` button.
+- [X] From the project root: `make generate` to regenerate `WhisperIntent.xcodeproj` from `project.yml` (picks up any new files added to `App/WhisperIntent/`).
+- [X] Open `WhisperIntent.xcodeproj` (`xed .` or double-click).
+- [X] Select the **WhisperIntent** scheme. Pick **Release** as the build configuration (Debug skews ML perf and we want representative timing).
+- [X] Set the run destination to your physical iPhone.
+- [X] Build & Run (⌘R). Wait for first launch on device.
+- [X] Verify `RootView` appears: `Whisper Intent` title + the `Open spike harness` button.
 
-**Observed app version / build:** `___________`
+**Observed app version / build:** `1`
 
 ---
 
