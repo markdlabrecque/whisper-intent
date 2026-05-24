@@ -27,7 +27,7 @@ struct TranscribeSpeechIntent: AppIntent {
 
   @MainActor
   func perform() async throws -> some IntentResult & ReturnsValue<String> {
-    // Deferred to M5. See docs/TDD.md §7.1 and docs/spikes/S2-foreground-escalation.md.
+    // Deferred to M5. See docs/TDD.md §7.1 and docs/spike-decisions.md § S2.
     .result(value: "")
   }
 }

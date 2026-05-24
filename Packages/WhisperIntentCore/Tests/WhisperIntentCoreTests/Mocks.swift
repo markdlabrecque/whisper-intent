@@ -25,6 +25,7 @@ actor MockRecorder: AudioRecording {
 
   private var buffersHandler: (@Sendable ([Float]) -> Void)?
   private var levelHandler: (@Sendable (Float) -> Void)?
+  private var stoppedHandler: (@Sendable (AudioRecorderStopReason) -> Void)?
 
   func setStart(_ behavior: StartBehavior) {
     startBehavior = behavior
@@ -44,25 +45,38 @@ actor MockRecorder: AudioRecording {
     levelHandler?(level)
   }
 
+  /// Drives the stopped callback from the test side.
+  func emit(stopped reason: AudioRecorderStopReason) {
+    stoppedHandler?(reason)
+  }
+
   // MARK: - AudioRecording
 
   nonisolated func start(
     maxDuration: TimeInterval,
     buffers: @Sendable @escaping ([Float]) -> Void,
-    level: @Sendable @escaping (Float) -> Void
+    level: @Sendable @escaping (Float) -> Void,
+    stopped: @Sendable @escaping (AudioRecorderStopReason) -> Void
   ) async throws {
-    try await applyStart(maxDuration: maxDuration, buffers: buffers, level: level)
+    try await applyStart(
+      maxDuration: maxDuration,
+      buffers: buffers,
+      level: level,
+      stopped: stopped
+    )
   }
 
   private func applyStart(
     maxDuration: TimeInterval,
     buffers: @Sendable @escaping ([Float]) -> Void,
-    level: @Sendable @escaping (Float) -> Void
+    level: @Sendable @escaping (Float) -> Void,
+    stopped: @Sendable @escaping (AudioRecorderStopReason) -> Void
   ) async throws {
     startCount += 1
     lastMaxDuration = maxDuration
     buffersHandler = buffers
     levelHandler = level
+    stoppedHandler = stopped
     switch startBehavior {
     case .succeed:
       return
@@ -93,6 +107,7 @@ actor MockRecorder: AudioRecording {
     cancelCount += 1
     buffersHandler = nil
     levelHandler = nil
+    stoppedHandler = nil
   }
 }
 

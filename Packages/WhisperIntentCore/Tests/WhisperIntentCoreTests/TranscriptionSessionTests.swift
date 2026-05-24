@@ -134,6 +134,50 @@ struct TranscriptionSessionTests {
     }
   }
 
+  // MARK: - Recorder self-stop
+
+  @Test("recorder self-stop .normal triggers transcription pipeline")
+  func recorderSelfStopNormal() async throws {
+    let recorder = MockRecorder()
+    await recorder.setStop(.succeed(audio: [0.1, 0.2]))
+    let transcriber = MockTranscriber()
+    await transcriber.setBehavior(.succeed(progressEvents: [], transcript: "self-stopped"))
+    let session = TranscriptionSession(recorder: recorder, transcriber: transcriber)
+
+    try await session.startRecording(config: defaultConfig())
+
+    // Simulate the recorder hitting its max-duration cap.
+    await recorder.emit(stopped: .normal)
+
+    let transcript = try await session.awaitCompletion()
+    #expect(transcript == "self-stopped")
+  }
+
+  @Test("recorder self-stop .failure(interrupted) ends with .failed")
+  func recorderSelfStopFailure() async throws {
+    let recorder = MockRecorder()
+    let session = TranscriptionSession(recorder: recorder, transcriber: MockTranscriber())
+
+    try await session.startRecording(config: defaultConfig())
+    await recorder.emit(stopped: .failure(.interrupted))
+
+    do {
+      _ = try await session.awaitCompletion()
+      Issue.record("expected throw")
+    } catch let error as SessionError {
+      #expect(error == .interrupted)
+    } catch {
+      Issue.record("wrong error type: \(error)")
+    }
+
+    let final = await session.state
+    if case .failed(.interrupted) = final {
+      // ok
+    } else {
+      Issue.record("expected .failed(.interrupted), got \(final)")
+    }
+  }
+
   // MARK: - Cancellation
 
   @Test("cancel while recording produces .failed(.interrupted)")

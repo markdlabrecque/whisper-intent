@@ -43,7 +43,7 @@ WhisperKit publishes ML models at: https://huggingface.co/argmaxinc/whisperkit-c
 For spike S4 we use a checked-in shell script (see above). The longer-term
 mechanism (build-time SwiftPM plugin vs. continuing with the script) will be
 revisited if S4's outcome forces a switch to On-Demand Resources — see
-[`docs/spikes/S4-install-size.md`](../../../../docs/spikes/S4-install-size.md).
+[`docs/spike-decisions.md § S4`](../../../../docs/spike-decisions.md).
 
 ## CI
 
