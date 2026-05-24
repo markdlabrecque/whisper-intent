@@ -35,18 +35,18 @@ Tick boxes inline as you go. Paste console excerpts and transcripts where the do
 
 The `DebugRecordingView` requests microphone permission lazily on the first tap of **Start recording**. Mic permission must be in the `.undetermined` state for this section (it is on a fresh install).
 
-- [ ] Tap **Open spike harness** from `RootView`.
-- [ ] Tap **Open recording harness** in the M3 section.
-- [ ] Confirm the State shows `idle`, mic-permission line shows `undetermined`.
-- [ ] Tap **Start recording**. iOS should show a permission alert. The heading reads `"Whisper Intent" Would Like to Access the Microphone` (supplied by iOS). The body underneath comes from `App/WhisperIntent/Info.plist` (key `NSMicrophoneUsageDescription`) and should read **exactly**: "Whisper Intent records your voice when an Apple Shortcut calls the Transcribe Speech action. Audio stays on your iPhone."
-- [ ] Tap **Allow**.
-- [ ] Mic-permission line should update to `granted`. State should transition to `recording`. Level bar should start moving.
+- [X] Tap **Open spike harness** from `RootView`.
+- [X] Tap **Open recording harness** in the M3 section.
+- [X] Confirm the State shows `idle`, mic-permission line shows `undetermined`.
+- [X] Tap **Start recording**. iOS should show a permission alert. The heading reads `"Whisper Intent" Would Like to Access the Microphone` (supplied by iOS). The body underneath comes from `App/WhisperIntent/Info.plist` (key `NSMicrophoneUsageDescription`) and should read **exactly**: "Whisper Intent records your voice when an Apple Shortcut calls the Transcribe Speech action. Audio stays on your iPhone."
+- [X] Tap **Allow**.
+- [X] Mic-permission line should update to `granted`. State should transition to `recording`. Level bar should start moving.
 
 | | Result | Notes |
 |---|---|---|
-| Permission prompt appeared | ☐ pass ☐ fail | |
-| Description text matches Info.plist | ☐ pass ☐ fail | |
-| State transitioned to `recording` after grant | ☐ pass ☐ fail | |
+| Permission prompt appeared | ☐ pass ☐ fail | pass |
+| Description text matches Info.plist | ☐ pass ☐ fail | pass |
+| State transitioned to `recording` after grant | ☐ pass ☐ fail | pass |
 
 **If the prompt never appears or the app crashes immediately:** check the Xcode console for "This app has crashed because it attempted to access privacy-sensitive data without a usage description" — that means `NSMicrophoneUsageDescription` is missing from the built `Info.plist` and the build is stale.
 
@@ -56,21 +56,21 @@ The `DebugRecordingView` requests microphone permission lazily on the first tap 
 
 Test the basic record → transcribe → result cycle with a single short sentence.
 
-- [ ] If state is anything other than `idle`, tap the action button to reset.
-- [ ] Tap **Start recording**.
-- [ ] State shows `recording`. Level bar moves while you speak.
-- [ ] Speak a short, distinctive sentence (e.g., **"The quick brown fox jumps over the lazy dog"**) — about 3–4 seconds.
-- [ ] Tap **Stop**.
-- [ ] State transitions: `recording → processing(starting) → processing(phase(encoding)) → processing(phase(decoding)) → completed`. Each transition should be visible briefly. The encoding → decoding transition can be very fast on shorter inputs.
-- [ ] Transcript appears in the box below.
+- [X] If state is anything other than `idle`, tap the on-screen primary button (the big bordered-prominent button at the bottom of the harness — its label changes between `Start recording`, `Stop`, and `Transcribing…` depending on state). For `.completed` / `.failed` it reads `Start recording` and tapping it both resets the session and begins a fresh recording.
+- [X] Tap **Start recording**.
+- [X] State shows `recording`. Level bar moves while you speak.
+- [X] Speak a short, distinctive sentence (e.g., **"The quick brown fox jumps over the lazy dog"**) — about 3–4 seconds.
+- [X] Tap **Stop**.
+- [X] State transitions: `recording → processing(starting) → processing(phase(encoding)) → processing(phase(decoding)) → completed`. Each transition should be visible briefly. The encoding → decoding transition can be very fast on shorter inputs.
+- [X] Transcript appears in the box below.
 
 | Step | Result | Notes |
 |---|---|---|
-| Recording started cleanly | ☐ pass ☐ fail | |
-| Level meter moves with voice | ☐ pass ☐ fail | |
-| Stop transitioned to processing | ☐ pass ☐ fail | |
-| Processing reached `completed` | ☐ pass ☐ fail | |
-| Transcript is plausibly correct | ☐ pass ☐ fail | |
+| Recording started cleanly | ☐ pass ☐ fail | pass |
+| Level meter moves with voice | ☐ pass ☐ fail | pass |
+| Stop transitioned to processing | ☐ pass ☐ fail | pass |
+| Processing reached `completed` | ☐ pass ☐ fail | pass |
+| Transcript is plausibly correct | ☐ pass ☐ fail | pass |
 
 **Transcript actually produced:** `_________________________________________________`
 
@@ -82,23 +82,23 @@ Test the basic record → transcribe → result cycle with a single short senten
 
 Verifies the recorder + transcriber handle a non-trivial buffer without exhausting memory or producing a degraded transcript.
 
-- [ ] Tap the action button to reset, then tap **Start recording**.
-- [ ] Speak continuously for ~60 seconds. Read a paragraph from a book, recite a memorised passage, or describe what you're looking at right now.
-- [ ] Tap **Stop**.
-- [ ] Wait for transcription to complete. Note wall-clock time.
-- [ ] Skim the transcript for obvious quality regressions (dropped words mid-sentence, long stretches of garbled output, runaway repetition).
+- [X] Tap the on-screen `Start recording` button.
+- [X] Speak continuously for ~60 seconds. Read a paragraph from a book, recite a memorised passage, or describe what you're looking at right now.
+- [X] Tap **Stop**.
+- [X] Wait for transcription to complete. Note wall-clock time.
+- [X] Skim the transcript for obvious quality regressions (dropped words mid-sentence, long stretches of garbled output, runaway repetition).
 
 | | Result | Notes |
 |---|---|---|
-| Recording captured the full ~60s | ☐ pass ☐ fail | |
-| Transcription completed | ☐ pass ☐ fail | |
-| Transcript reads coherently | ☐ pass ☐ fail | |
+| Recording captured the full ~60s | ☐ pass ☐ fail | pass |
+| Transcription completed | ☐ pass ☐ fail | pass |
+| Transcript reads coherently | ☐ pass ☐ fail | pass |
 
-**Transcription wall-clock time:** `_____` seconds
+**Transcription wall-clock time:** `55 seconds` seconds
 
 **Anything notable about the transcript:**
 ```
-(paste a snippet or any oddities)
+Nothing - it was perfect
 ```
 
 ---
@@ -109,7 +109,7 @@ The recorder subscribes to `AVAudioSession.interruptionNotification` and should 
 
 Skip and mark N/A if you don't have a way to phone this device. Cellular call is the most reliable interrupter; FaceTime / WhatsApp also work.
 
-- [ ] Tap the action button to reset, then tap **Start recording**.
+- [ ] Tap the on-screen `Start recording` button.
 - [ ] Speak normally for a few seconds.
 - [ ] Have the second device place a call to this iPhone (or initiate a FaceTime call).
 - [ ] Observe the state on the iPhone as the call rings / connects.
@@ -131,21 +131,21 @@ Tests `AVAudioSession.routeChangeNotification` handling with reason `.oldDeviceU
 
 Skip and mark N/A if no Bluetooth headphones are available.
 
-- [ ] Connect AirPods (or other Bluetooth headphones) to the iPhone.
-- [ ] Confirm audio is being routed to them (Control Center → AirPlay icon).
-- [ ] Tap the action button to reset, then tap **Start recording**.
-- [ ] Speak normally for a few seconds.
-- [ ] Disconnect the AirPods (open the case, or hold both stems until they unpair, or toggle Bluetooth off).
-- [ ] Observe the state on the iPhone.
-- [ ] State should transition to `failed(interrupted)`. Level bar freezes.
-- [ ] Reconnect AirPods (or toggle Bluetooth back on if disabled).
-- [ ] Tap **Start recording** again to verify a clean restart.
+- [X] Connect AirPods (or other Bluetooth headphones) to the iPhone.
+- [X] Confirm audio is being routed to them (Control Center → AirPlay icon).
+- [X] Tap the on-screen `Start recording` button.
+- [X] Speak normally for a few seconds.
+- [X] Disconnect the AirPods (open the case, or hold both stems until they unpair, or toggle Bluetooth off).
+- [X] Observe the state on the iPhone.
+- [X] State should transition to `failed(interrupted)`. Level bar freezes.
+- [X] Reconnect AirPods (or toggle Bluetooth back on if disabled).
+- [X] Tap **Start recording** again to verify a clean restart.
 
 | | Result | Notes |
 |---|---|---|
-| State went to `failed(interrupted)` | ☐ pass ☐ fail ☐ N/A | |
-| App did not crash or hang | ☐ pass ☐ fail ☐ N/A | |
-| Restart after route loss works | ☐ pass ☐ fail ☐ N/A | |
+| State went to `failed(interrupted)` | ☐ pass ☐ fail ☐ N/A | pass |
+| App did not crash or hang | ☐ pass ☐ fail ☐ N/A | pass |
+| Restart after route loss works | ☐ pass ☐ fail ☐ N/A | pass |
 
 ---
 
@@ -153,20 +153,20 @@ Skip and mark N/A if no Bluetooth headphones are available.
 
 Verifies `requestMicrophone()` surfaces denial cleanly.
 
-- [ ] Open **Settings → Privacy & Security → Microphone → Whisper Intent**. Toggle it **off**.
-- [ ] Return to the app. (May require a relaunch — iOS sometimes terminates apps when their privacy switches change. If so, relaunch from the home screen.)
-- [ ] Tap **Open spike harness → Open recording harness**.
-- [ ] Tap **Start recording**.
-- [ ] Mic-permission line should read `denied`. An error message should appear: "Microphone permission not granted (denied)."
-- [ ] State should remain `idle`. No crash, no recording.
-- [ ] Re-enable microphone access in Settings.
-- [ ] Tap **Start recording** again. Should now proceed into `recording` cleanly (no second prompt — permission is already granted).
+- [X] Open **Settings → Privacy & Security → Microphone → Whisper Intent**. Toggle it **off**.
+- [X] Return to the app. (May require a relaunch — iOS sometimes terminates apps when their privacy switches change. If so, relaunch from the home screen.)
+- [X] Tap **Open spike harness → Open recording harness**.
+- [X] Tap **Start recording**.
+- [X] Mic-permission line should read `denied`. An error message should appear: "Microphone permission not granted (denied)."
+- [X] State should remain `idle`. No crash, no recording.
+- [X] Re-enable microphone access in Settings.
+- [X] Tap **Start recording** again. Should now proceed into `recording` cleanly (no second prompt — permission is already granted).
 
 | | Result | Notes |
 |---|---|---|
-| Denied state surfaces error | ☐ pass ☐ fail | |
-| App does not crash on denial | ☐ pass ☐ fail | |
-| Re-grant via Settings works without prompt | ☐ pass ☐ fail | |
+| Denied state surfaces error | ☐ pass ☐ fail | pass |
+| App does not crash on denial | ☐ pass ☐ fail | pass |
+| Re-grant via Settings works without prompt | ☐ pass ☐ fail | pass |
 
 ---
 
@@ -174,17 +174,17 @@ Verifies `requestMicrophone()` surfaces denial cleanly.
 
 The recording UI is a debug screen, not the AppIntent foreground sheet — so this is informational only. It tells us how `AVAudioEngine` behaves when the app is backgrounded without the proper background-audio entitlement (which v1 doesn't include).
 
-- [ ] Tap the action button to reset, then tap **Start recording**.
-- [ ] Swipe up (home gesture) to send the app to the background while still recording.
-- [ ] Wait ~5 seconds.
-- [ ] Swipe back to the app.
-- [ ] Observe the state.
+- [X] Tap the on-screen `Start recording` button.
+- [X] Swipe up (home gesture) to send the app to the background while still recording.
+- [X] Wait ~5 seconds.
+- [X] Swipe back to the app.
+- [X] Observe the state.
 
 | | Result | Notes |
 |---|---|---|
-| State after foregrounding | record what state was: `_______________` | |
-| App did not crash | ☐ pass ☐ fail | |
-| Restart from current state works | ☐ pass ☐ fail | |
+| State after foregrounding | record what state was: `_______________` | Recording |
+| App did not crash | ☐ pass ☐ fail | pass |
+| Restart from current state works | ☐ pass ☐ fail | pass |
 
 **Acceptable outcomes:** the recording continues (iOS may allow audio capture briefly while backgrounded), OR the session transitions to `failed(interrupted)` because iOS suspended the audio session. Either is fine for the debug view. The production AppIntent will set `supportedModes: [.background, .foreground(.dynamic)]` and have a different lifecycle — that's M5/M4 territory.
 
@@ -260,4 +260,4 @@ Once green, close GitHub issue #7 with a one-line summary, then green-light M4 (
 - Spike S1 measured ~25 Hz progress callbacks with no degradation on a 5-minute sample. If you're seeing pauses that look like a stall, capture a sample with Instruments → Time Profiler.
 
 **Recording UI looks frozen:**
-- The action button disables itself while an async operation is in flight (`actionInFlight`). If it stays disabled forever, that suggests the underlying `Task` never returns — file a follow-up with the state value visible at the time.
+- The on-screen button disables itself while an async operation is in flight (`isBusy`). If it stays disabled forever, that suggests the underlying `Task` never returns — file a follow-up with the state value visible at the time.

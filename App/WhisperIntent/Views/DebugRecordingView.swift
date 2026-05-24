@@ -12,7 +12,7 @@ import WhisperIntentCore
 struct DebugRecordingView: View {
   @State private var state: TranscriptionSession.State = .idle
   @State private var permissionStatus: PermissionsService.MicrophoneStatus = .undetermined
-  @State private var actionInFlight = false
+  @State private var isBusy = false
   @State private var lastError: String?
 
   private var session: TranscriptionSession {
@@ -29,7 +29,7 @@ struct DebugRecordingView: View {
         statusBlock
         levelBlock
         transcriptBlock
-        actionButton
+        primaryButton
         if let error = lastError {
           Text(error)
             .font(.footnote)
@@ -95,14 +95,14 @@ struct DebugRecordingView: View {
     }
   }
 
-  private var actionButton: some View {
+  private var primaryButton: some View {
     Button(action: handleTap) {
       Text(buttonLabel)
         .frame(maxWidth: .infinity)
     }
     .buttonStyle(.borderedProminent)
     .controlSize(.large)
-    .disabled(actionInFlight)
+    .disabled(isBusy)
   }
 
   // MARK: - Labels
@@ -128,10 +128,10 @@ struct DebugRecordingView: View {
   // MARK: - Actions
 
   private func handleTap() {
-    actionInFlight = true
+    isBusy = true
     lastError = nil
     Task {
-      defer { Task { @MainActor in actionInFlight = false } }
+      defer { Task { @MainActor in isBusy = false } }
       switch state {
       case .idle, .completed, .failed:
         await startRecording()
