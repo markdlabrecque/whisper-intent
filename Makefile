@@ -17,8 +17,11 @@ generate:
 build:
 	cd Packages/WhisperIntentCore && swift build
 
-test:
+SIMULATOR_DESTINATION ?= platform=iOS Simulator,name=iPhone 17 Pro
+
+test: $(PROJECT)
 	cd Packages/WhisperIntentCore && swift test
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(SIMULATOR_DESTINATION)' test
 
 app-build: $(PROJECT)
 	xcodebuild -project $(PROJECT) -scheme $(SCHEME) -destination '$(DESTINATION)' build
