@@ -14,6 +14,11 @@ final class AppEnvironment: ObservableObject {
 
   let permissions = PermissionsService()
 
+  /// Active recording-sheet presentation, set by the AppIntent when `showUI = true`.
+  /// `RootView` observes this and presents `RecordingSheet`. Cleared when the sheet
+  /// dismisses (sheet auto-dismisses on `.completed` / `.failed`).
+  @Published var recordingPresentation: RecordingPresentation?
+
   /// Spike S2 harness state — remove (or re-gate) before TestFlight in M6.
   @Published var helloPresentation: DebugHelloPresentation?
 
@@ -39,7 +44,20 @@ final class AppEnvironment: ObservableObject {
     helloContinuation = nil
   }
 
+  func presentRecordingSheet(prompt: String?) {
+    recordingPresentation = RecordingPresentation(prompt: prompt)
+  }
+
+  func dismissRecordingSheet() {
+    recordingPresentation = nil
+  }
+
   private init() {}
+}
+
+struct RecordingPresentation: Identifiable {
+  let id = UUID()
+  let prompt: String?
 }
 
 struct DebugHelloPresentation: Identifiable {

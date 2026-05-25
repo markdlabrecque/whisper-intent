@@ -43,6 +43,7 @@ struct TranscribeSpeechIntent: AppIntent {
     }
 
     if showUI, systemContext.currentMode.canContinueInForeground {
+      environment.presentRecordingSheet(prompt: prompt)
       try await continueInForeground(
         "Opening Whisper Intent for recording.",
         alwaysConfirm: false
