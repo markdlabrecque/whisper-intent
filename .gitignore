@@ -83,6 +83,7 @@ asc_api_key*.json
 # Fastlane (in case it gets adopted later)
 fastlane/.env
 fastlane/.env.*
+!fastlane/.env.example
 fastlane/Appfile.local
 fastlane/Matchfile.local
 
@@ -100,6 +101,7 @@ ExportOptions.plist
 *.env
 .env
 .env.*
+!fastlane/.env.example
 .envrc
 .netrc
 secrets/

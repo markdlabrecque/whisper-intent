@@ -7,10 +7,10 @@ Build, sign, and upload TestFlight beta builds. v1 scope is intentionally narrow
 Install the toolchain:
 
 ```bash
-brew install fastlane
+bundle install      # pinned via the repo's Gemfile + Gemfile.lock
 ```
 
-(Or use `bundler` if you prefer pinning — `Gemfile` is not provided in v1.)
+(Or `brew install fastlane` if you prefer the system-wide version. The lanes work either way; the Gemfile is the reproducible path.)
 
 Confirm Xcode 26 is the active toolchain:
 
