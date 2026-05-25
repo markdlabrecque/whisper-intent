@@ -91,6 +91,11 @@ fastlane/Matchfile.local
 Config.local.swift
 Secrets.swift
 
+# IPA export options carry the developer team ID; generated locally by
+# `make release-ipa` from a template if missing. Not committed so each
+# developer/CI can fill in their own team ID.
+ExportOptions.plist
+
 # Generic credential / env files
 *.env
 .env
