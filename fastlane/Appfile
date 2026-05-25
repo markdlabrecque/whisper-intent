@@ -1,0 +1,7 @@
+app_identifier("com.marklabrecque.whisperintent")
+
+# Apple ID and team identifiers are sourced from the environment so this file
+# stays free of personal/identifying data. Set in fastlane/.env (gitignored).
+apple_id(ENV["FASTLANE_APPLE_ID"]) if ENV["FASTLANE_APPLE_ID"]
+team_id(ENV["DEVELOPMENT_TEAM"])    if ENV["DEVELOPMENT_TEAM"]
+itc_team_id(ENV["ASC_TEAM_ID"])     if ENV["ASC_TEAM_ID"]

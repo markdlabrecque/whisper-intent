@@ -1,0 +1,122 @@
+# Fastfile — Whisper Intent
+#
+# Lanes:
+#   bundle exec fastlane beta            # build + upload to TestFlight
+#   bundle exec fastlane build_archive   # produce a signed .xcarchive only
+#
+# Prerequisites (none are committed to the repo):
+#   - Apple Developer team configured in Xcode (DEVELOPMENT_TEAM build setting).
+#   - App Store Connect API key (.p8) referenced via ENV ASC_KEY_ID,
+#     ASC_ISSUER_ID, ASC_KEY_FILEPATH — set in fastlane/.env (gitignored).
+#   - A matching provisioning profile available locally OR Match configured.
+#
+# Whisper Intent does not commit any signing material. The lanes below fail
+# loudly if the required ENV vars are missing rather than guessing.
+
+default_platform(:ios)
+
+WORKSPACE_PATH = "WhisperIntent.xcodeproj"
+SCHEME         = "WhisperIntent"
+APP_IDENTIFIER = "com.marklabrecque.whisperintent"
+
+platform :ios do
+  before_all do
+    # XcodeGen-generated .xcodeproj is gitignored. Regenerate so the lane is
+    # idempotent regardless of the local working-tree state.
+    sh("cd .. && xcodegen generate")
+  end
+
+  desc "Produce a signed .xcarchive for App Store distribution."
+  desc "Output: ../build/WhisperIntent.xcarchive"
+  lane :build_archive do
+    ensure_env!(%w[
+      DEVELOPMENT_TEAM
+    ])
+
+    build_app(
+      project: WORKSPACE_PATH,
+      scheme: SCHEME,
+      configuration: "Release",
+      destination: "generic/platform=iOS",
+      output_directory: "../build",
+      output_name: "WhisperIntent",
+      archive_path: "../build/WhisperIntent.xcarchive",
+      export_method: "app-store",
+      skip_package_ipa: true,
+      xcargs: "DEVELOPMENT_TEAM=#{ENV['DEVELOPMENT_TEAM']} CURRENT_PROJECT_VERSION=#{git_sha}"
+    )
+  end
+
+  desc "Build, sign, and upload a TestFlight beta build."
+  desc "Requires App Store Connect API key in ENV (ASC_KEY_ID, ASC_ISSUER_ID,"
+  desc "ASC_KEY_FILEPATH). Uses pilot for the upload."
+  lane :beta do
+    ensure_env!(%w[
+      DEVELOPMENT_TEAM
+      ASC_KEY_ID
+      ASC_ISSUER_ID
+      ASC_KEY_FILEPATH
+    ])
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_filepath: ENV["ASC_KEY_FILEPATH"]
+    )
+
+    build_app(
+      project: WORKSPACE_PATH,
+      scheme: SCHEME,
+      configuration: "Release",
+      destination: "generic/platform=iOS",
+      output_directory: "../build",
+      output_name: "WhisperIntent",
+      export_method: "app-store",
+      xcargs: "DEVELOPMENT_TEAM=#{ENV['DEVELOPMENT_TEAM']} CURRENT_PROJECT_VERSION=#{git_sha}"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: "../build/WhisperIntent.ipa",
+      skip_waiting_for_build_processing: true,
+      changelog: testflight_changelog
+    )
+  end
+
+  # ---------------------------------------------------------------------------
+
+  def ensure_env!(keys)
+    missing = keys.reject { |k| ENV[k] && !ENV[k].empty? }
+    return if missing.empty?
+
+    UI.user_error!(
+      "Missing required environment variables: #{missing.join(', ')}.\n" \
+      "Set them in fastlane/.env (gitignored) or your shell. See fastlane/README.md."
+    )
+  end
+
+  def git_sha
+    `git rev-parse --short HEAD`.strip
+  end
+
+  def testflight_changelog
+    path = File.expand_path("../docs/testflight-what-to-test.md", __dir__)
+    return nil unless File.exist?(path)
+
+    # Extract everything between the "## What to test — paste into TestFlight"
+    # header and the next top-level "##" header. Strips the leading blockquote
+    # markers so the upload body reads cleanly in the TestFlight client.
+    body = File.read(path)
+    section = body.split(/^## /).find { |s| s.start_with?("What to test") }
+    return nil unless section
+
+    section
+      .lines
+      .drop(1) # drop the header line itself
+      .take_while { |l| !l.start_with?("---") }
+      .map { |l| l.sub(/^>\s?/, "") }
+      .join
+      .strip
+  end
+end
