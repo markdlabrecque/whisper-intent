@@ -1,4 +1,4 @@
-.PHONY: generate build test app-build app-build-release release-archive release-ipa lint clean tools
+.PHONY: generate build test app-build app-build-release release-archive release-ipa lint clean tools verify doctor
 
 PROJECT := WhisperIntent.xcodeproj
 SCHEME  := WhisperIntent
@@ -104,3 +104,15 @@ tools:
 	@command -v swiftlint >/dev/null  || (echo "Install: brew install swiftlint"  && exit 1)
 	@command -v gitleaks >/dev/null   || (echo "Install: brew install gitleaks"   && exit 1)
 	@echo "All tools present."
+
+## Aggregate pre-push check. Runs tests, lint, and both Debug + Release
+## simulator builds. Fails fast on the first red.
+verify: test lint app-build app-build-release
+	@echo "✅ verify passed: tests, lint, debug build, release build."
+
+## Self-diagnostic. Prints a per-row pass/fail report on local prerequisites:
+## required CLI tools, Xcode toolchain, WhisperKit model files, Fastlane
+## environment (if .env is present), and signing-related configuration.
+## Always exits 0 — meant for humans, not CI gating.
+doctor:
+	@scripts/doctor.sh
