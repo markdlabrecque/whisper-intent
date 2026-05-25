@@ -49,13 +49,9 @@ struct TranscribeSpeechIntent: AppIntent {
       )
     }
 
-    // Spike S3 pins the production cap value (PRD §5.4.1). Until it lands we
-    // use a generous cap so the spike runs can exercise the duration ladder
-    // without hitting a self-imposed limit before iOS's natural budget.
-    let spikeMaxDuration: TimeInterval = 600
     let config = RecordingConfig(
       silenceThreshold: silenceThreshold,
-      maxDuration: spikeMaxDuration,
+      maxDuration: RecordingLimits.maxRecordingSeconds,
       prompt: prompt
     )
 

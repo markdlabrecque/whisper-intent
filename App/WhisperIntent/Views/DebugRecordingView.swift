@@ -180,8 +180,10 @@ struct DebugRecordingView: View {
       return
     }
 
-    // Generous cap for the debug harness; production cap from M4 will replace this.
-    let config = RecordingConfig(silenceThreshold: 0, maxDuration: 300)
+    let config = RecordingConfig(
+      silenceThreshold: 0,
+      maxDuration: RecordingLimits.maxRecordingSeconds
+    )
     do {
       try await session.startRecording(config: config)
     } catch {
