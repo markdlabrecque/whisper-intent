@@ -1,25 +1,58 @@
 import SwiftUI
 import WhisperIntentCore
 
-/// Re-entry surface (PRD §5.8). Shows the same in-flight recording/processing UI as
-/// the AppIntent's recording sheet if a session is active; otherwise the landing
-/// screen with onboarding link or settings. Implementation deferred to M5.
+/// App-launch surface. Two responsibilities:
+///
+/// 1. **Re-entry surface (PRD §5.8).** When the user opens the app from
+///    springboard while a recording or transcription is in flight, render the
+///    same visual treatment as `RecordingSheet` so the experience is continuous.
+/// 2. **Landing screen** when idle: brief explainer, settings, debug entry.
+///
+/// `RecordingSheet` is presented over this view when the AppIntent escalates
+/// to foreground with `showUI = true` (see `AppEnvironment.recordingPresentation`).
+@MainActor
 struct RootView: View {
   @StateObject private var environment = AppEnvironment.shared
+  @State private var state: TranscriptionSession.State = .idle
   @State private var showSpikes = false
+  @State private var showSettings = false
+  @State private var showOnboarding = !UserSettings.onboardingCompleted
+
+  private var session: TranscriptionSession {
+    environment.session
+  }
 
   var body: some View {
-    VStack(spacing: 24) {
-      Text("Whisper Intent")
-        .font(.title)
-      Text("Production UI lands in M5.")
-        .font(.footnote)
-        .foregroundStyle(.secondary)
-
-      Button("Open spike harness") { showSpikes = true }
-        .buttonStyle(.borderedProminent)
+    NavigationStack {
+      content
+        .navigationTitle("Whisper Intent")
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Button {
+              showSettings = true
+            } label: {
+              Image(systemName: "gear")
+            }
+            .accessibilityLabel("Settings")
+          }
+        }
     }
-    .padding()
+    .task {
+      for await next in await session.stateStream {
+        state = next
+      }
+    }
+    .sheet(item: $environment.recordingPresentation) { presentation in
+      RecordingSheet(prompt: presentation.prompt) {
+        environment.dismissRecordingSheet()
+      }
+    }
+    .fullScreenCover(isPresented: $showOnboarding) {
+      OnboardingView { showOnboarding = false }
+    }
+    .sheet(isPresented: $showSettings) {
+      NavigationStack { SettingsView() }
+    }
     .sheet(isPresented: $showSpikes) {
       DebugSpikesView()
     }
@@ -28,6 +61,73 @@ struct RootView: View {
         environment.finishHelloSpike()
       }
     }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    switch state {
+    case .idle, .completed, .failed:
+      landing
+    case .recording, .processing:
+      // Mirror the recording sheet's visuals so a user who opened the app from
+      // springboard mid-session sees the same surface (PRD §5.8). The sheet
+      // itself, if also presented, will sit on top.
+      RecordingSheet(prompt: nil) {}
+    }
+  }
+
+  private var landing: some View {
+    VStack(spacing: 24) {
+      Spacer()
+
+      VStack(spacing: 8) {
+        Image(systemName: "waveform")
+          .font(.system(size: 64))
+          .foregroundStyle(.tint)
+        Text("Voice capture for Shortcuts")
+          .font(.title3)
+          .multilineTextAlignment(.center)
+        Text(
+          """
+          Whisper Intent adds a Transcribe Speech step to Apple Shortcuts. \
+          Trigger it from Siri, the Action Button, or any other Shortcut surface.
+          """
+        )
+        .font(.callout)
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal)
+      }
+
+      if case let .completed(transcript) = state {
+        completedPreview(transcript: transcript)
+      }
+
+      Spacer()
+
+      #if DEBUG
+        Button("Spike harness") { showSpikes = true }
+          .buttonStyle(.bordered)
+      #endif
+    }
+    .padding()
+  }
+
+  private func completedPreview(transcript: String) -> some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("Last transcript")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+      ScrollView {
+        Text(transcript.isEmpty ? "(empty transcript)" : transcript)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
+      .frame(maxHeight: 160)
+      .padding(12)
+      .background(.thinMaterial)
+      .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+    .padding(.horizontal)
   }
 }
 
