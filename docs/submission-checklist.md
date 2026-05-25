@@ -33,7 +33,7 @@ Single source of truth for "are we ready to submit v1?" Every blocker has an own
 | B1 | Spike S3 closed (cap value chosen) | 🔴 | eng | On-device matrix in `docs/spikes/S3-background-budget.md`. Currently shelved; placeholder `RecordingLimits.maxRecordingSeconds = 600`. |
 | B2 | All `{MAX_DURATION}` placeholders replaced | 🔴 | eng | Files: `RecordingLimits.swift`, `OnboardingView.swift`, `app-store-listing.md`. `grep -ri "MAX_DURATION"` must return zero. Blocked on B1. |
 | B3 | Onboarding Screen 3 cap sentence restored | 🔴 | eng | Omitted at M5 with S3 shelved. Blocked on B1. |
-| B4 | App icon at all required sizes | ⚪ | design | Placeholder icon exists. Use `scripts/resize-icon.sh` once a 1024×1024 source is supplied. |
+| B4 | App icon at all required sizes | 🟡 | design | Placeholder icon (`AppIcon.png`, regenerable from `AppIcon.svg` via `scripts/regenerate-placeholder-icon.sh`) is good enough for TestFlight. Final designed icon installs via `scripts/resize-icon.sh` once a 1024×1024 source is supplied. |
 | B5 | Five App Store screenshots (6.7") | ⚪ | design/eng | Per `docs/app-store-listing.md` §Screenshots. Need real device + B1 cap surfaced in UI. |
 | B6 | App Store Connect record created | ⚪ | ops | Deferred from M0. Bundle ID `com.marklabrecque.whisperintent`. |
 | B7 | Privacy policy hosted at a stable URL | ⚪ | ops | Source: `docs/privacy-policy.md`. Hosting choice TBD (GitHub Pages, static site, etc.). |

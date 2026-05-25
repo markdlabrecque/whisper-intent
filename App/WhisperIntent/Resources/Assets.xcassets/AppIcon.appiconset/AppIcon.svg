@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Whisper Intent — placeholder app icon, 1024x1024.
+
+  Source-of-truth for the committed AppIcon.png. Regenerate the PNG via:
+
+      scripts/regenerate-placeholder-icon.sh
+
+  The PNG is what Xcode reads; this SVG exists so the placeholder can be
+  reproduced or tweaked without losing fidelity. The final designed icon
+  will replace AppIcon.png (and, if it has an SVG source, this file too).
+
+  Mark: a stylized voice-capture glyph — central waveform bars
+  surrounded by parenthesis-like ear/listening curves.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Background: dark navy with rounded corners (squircle approximation). -->
+  <rect x="0" y="0" width="1024" height="1024" rx="180" ry="180" fill="#0A0F1F"/>
+
+  <!-- Listening parentheses — cream. -->
+  <g stroke="#EEE5D6" stroke-width="48" stroke-linecap="round" fill="none">
+    <path d="M 360 250 Q 220 512 360 774" />
+    <path d="M 664 250 Q 804 512 664 774" />
+  </g>
+
+  <!-- Central waveform bars — light blue. -->
+  <g fill="#7DB9FF">
+    <rect x="488" y="380" width="48" height="264" rx="24" ry="24"/>
+    <rect x="404" y="430" width="40" height="164" rx="20" ry="20"/>
+    <rect x="580" y="430" width="40" height="164" rx="20" ry="20"/>
+  </g>
+</svg>
