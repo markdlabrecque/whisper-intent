@@ -14,7 +14,9 @@ import WhisperIntentCore
 struct RootView: View {
   @StateObject private var environment = AppEnvironment.shared
   @State private var state: TranscriptionSession.State = .idle
-  @State private var showSpikes = false
+  #if DEBUG
+    @State private var showSpikes = false
+  #endif
   @State private var showSettings = false
   @State private var showOnboarding = !UserSettings.onboardingCompleted
 
@@ -53,14 +55,16 @@ struct RootView: View {
     .sheet(isPresented: $showSettings) {
       NavigationStack { SettingsView() }
     }
+    #if DEBUG
     .sheet(isPresented: $showSpikes) {
-      DebugSpikesView()
-    }
-    .sheet(item: $environment.helloPresentation) { presentation in
-      DebugHelloView(presentation: presentation) {
-        environment.finishHelloSpike()
+        DebugSpikesView()
       }
-    }
+      .sheet(item: $environment.helloPresentation) { presentation in
+        DebugHelloView(presentation: presentation) {
+          environment.finishHelloSpike()
+        }
+      }
+    #endif
   }
 
   @ViewBuilder

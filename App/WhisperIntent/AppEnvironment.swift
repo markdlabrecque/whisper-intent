@@ -19,30 +19,33 @@ final class AppEnvironment: ObservableObject {
   /// dismisses (sheet auto-dismisses on `.completed` / `.failed`).
   @Published var recordingPresentation: RecordingPresentation?
 
-  /// Spike S2 harness state — remove (or re-gate) before TestFlight in M6.
-  @Published var helloPresentation: DebugHelloPresentation?
+  #if DEBUG
+    /// Spike S2 harness state — DEBUG builds only. Stripped from release so the
+    /// `Debug Hello` intent doesn't appear in the Shortcuts editor for users.
+    @Published var helloPresentation: DebugHelloPresentation?
 
-  private var helloContinuation: CheckedContinuation<String, Never>?
+    private var helloContinuation: CheckedContinuation<String, Never>?
 
-  func presentHelloSpike(name: String, currentMode: String) async -> String {
-    let greeting = "Hello, \(name)!"
-    helloPresentation = DebugHelloPresentation(
-      name: name,
-      greeting: greeting,
-      currentMode: currentMode
-    )
+    func presentHelloSpike(name: String, currentMode: String) async -> String {
+      let greeting = "Hello, \(name)!"
+      helloPresentation = DebugHelloPresentation(
+        name: name,
+        greeting: greeting,
+        currentMode: currentMode
+      )
 
-    return await withCheckedContinuation { continuation in
-      helloContinuation = continuation
+      return await withCheckedContinuation { continuation in
+        helloContinuation = continuation
+      }
     }
-  }
 
-  func finishHelloSpike() {
-    let greeting = helloPresentation?.greeting ?? "Hello!"
-    helloPresentation = nil
-    helloContinuation?.resume(returning: greeting)
-    helloContinuation = nil
-  }
+    func finishHelloSpike() {
+      let greeting = helloPresentation?.greeting ?? "Hello!"
+      helloPresentation = nil
+      helloContinuation?.resume(returning: greeting)
+      helloContinuation = nil
+    }
+  #endif
 
   func presentRecordingSheet(prompt: String?) {
     recordingPresentation = RecordingPresentation(prompt: prompt)
@@ -60,9 +63,11 @@ struct RecordingPresentation: Identifiable {
   let prompt: String?
 }
 
-struct DebugHelloPresentation: Identifiable {
-  let id = UUID()
-  let name: String
-  let greeting: String
-  let currentMode: String
-}
+#if DEBUG
+  struct DebugHelloPresentation: Identifiable {
+    let id = UUID()
+    let name: String
+    let greeting: String
+    let currentMode: String
+  }
+#endif
