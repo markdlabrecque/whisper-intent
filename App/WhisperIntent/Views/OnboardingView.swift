@@ -95,6 +95,7 @@ struct OnboardingView: View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Build the Shortcut you want.")
         .font(.title.weight(.semibold))
+        .accessibilityAddTraits(.isHeader)
       Text(
         """
         Open the Shortcuts app. Add Transcribe Speech as a step in any \
@@ -132,6 +133,7 @@ struct OnboardingView: View {
     VStack(alignment: .leading, spacing: 16) {
       Text("One quick test.")
         .font(.title.weight(.semibold))
+        .accessibilityAddTraits(.isHeader)
       Text(
         """
         Tap below and say a few words. This grants Whisper Intent permission \
@@ -269,6 +271,7 @@ private struct OnboardingScreen: View {
     VStack(alignment: .leading, spacing: 16) {
       Text(headline)
         .font(.title.weight(.semibold))
+        .accessibilityAddTraits(.isHeader)
       Text(bodyText)
         .font(.body)
     }

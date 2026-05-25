@@ -39,6 +39,8 @@ struct SettingsView: View {
             .monospacedDigit()
         }
         Slider(value: $silenceThreshold, in: 0.5 ... 10.0, step: 0.5)
+          .accessibilityLabel("Silence threshold in seconds")
+          .accessibilityValue(String(format: "%.1f seconds", silenceThreshold))
       }
     } header: {
       Text("Defaults")
@@ -83,6 +85,9 @@ struct SettingsView: View {
       }
     }
     .padding(.vertical, 4)
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("\(title). " + steps.enumerated().map { "Step \($0.offset + 1): \($0.element)." }
+      .joined(separator: " "))
   }
 
   private var aboutSection: some View {

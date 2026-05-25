@@ -88,9 +88,11 @@ struct RootView: View {
         Image(systemName: "waveform")
           .font(.system(size: 64))
           .foregroundStyle(.tint)
+          .accessibilityHidden(true)
         Text("Voice capture for Shortcuts")
           .font(.title3)
           .multilineTextAlignment(.center)
+          .accessibilityAddTraits(.isHeader)
         Text(
           """
           Whisper Intent adds a Transcribe Speech step to Apple Shortcuts. \

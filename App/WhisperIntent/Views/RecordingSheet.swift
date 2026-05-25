@@ -27,6 +27,7 @@ struct RecordingSheet: View {
           .font(.headline)
           .multilineTextAlignment(.center)
           .padding(.top, 24)
+          .accessibilityAddTraits(.isHeader)
       }
 
       Spacer(minLength: 0)
@@ -81,24 +82,33 @@ struct RecordingSheet: View {
       Text(formattedElapsed)
         .font(.system(size: 48, weight: .semibold, design: .rounded).monospacedDigit())
         .foregroundStyle(elapsedColor)
+        .accessibilityLabel(accessibleElapsed)
+        .accessibilityValue(elapsedSeverityLabel)
 
       LevelMeter(level: displayLevel(rms: level))
         .frame(height: 12)
+        .accessibilityHidden(true) // decorative; the "Recording" label conveys state
 
       Text("Recording")
         .font(.subheadline)
         .foregroundStyle(.secondary)
+        .accessibilityAddTraits(.isStaticText)
     }
+    .accessibilityElement(children: .combine)
   }
 
   private func processingContent(progress: TranscriptionProgress) -> some View {
     VStack(spacing: 16) {
       ProgressView()
         .controlSize(.large)
+        .accessibilityHidden(true)
       Text(processingLabel(progress))
         .font(.headline)
         .foregroundStyle(.secondary)
+        .accessibilityAddTraits(.updatesFrequently)
     }
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(processingLabel(progress))
   }
 
   private var primaryControl: some View {
@@ -136,6 +146,25 @@ struct RecordingSheet: View {
   private var formattedElapsed: String {
     let total = Int(elapsed)
     return String(format: "%d:%02d", total / 60, total % 60)
+  }
+
+  /// Spoken form, e.g. "2 minutes 13 seconds". Avoids VoiceOver reading
+  /// "0:13" as "zero colon one three" on the bare numeric counter.
+  private var accessibleElapsed: String {
+    let total = Int(elapsed)
+    let minutes = total / 60
+    let seconds = total % 60
+    var parts: [String] = []
+    if minutes > 0 { parts.append("\(minutes) minute\(minutes == 1 ? "" : "s")") }
+    parts.append("\(seconds) second\(seconds == 1 ? "" : "s")")
+    return "Elapsed: " + parts.joined(separator: " ")
+  }
+
+  private var elapsedSeverityLabel: String {
+    let fraction = elapsed / RecordingLimits.maxRecordingSeconds
+    if fraction >= RecordingLimits.criticalThreshold { return "approaching maximum recording length" }
+    if fraction >= RecordingLimits.warningThreshold { return "warning, nearing recording limit" }
+    return ""
   }
 
   /// Color shifts at the cap-relative thresholds defined in `RecordingLimits`
