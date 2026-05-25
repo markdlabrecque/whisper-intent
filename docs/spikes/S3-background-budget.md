@@ -1,10 +1,12 @@
 # Spike S3: Background execution budget & max-duration cap
 
-**Status:** Not started
+**Status:** Shelved (2026-05-25)
 **Owner:**
 **Started:**
 **Completed:**
 **Linked from:** [PRD §5.4.1](../PRD.md), [TDD §7.3](../TDD.md), [MILESTONES.md M4](../MILESTONES.md)
+
+> **Shelved 2026-05-25.** The spike wiring (`TranscribeSpeechIntent` driving `TranscriptionSession` with `showUI = false`, plus the S3 playback sample ladder) is in place, but the on-device test matrix in §3 has not been run. Development is proceeding to M5 with the cap value held as a parameterized constant in `RecordingConfig`. Run this spike before M6 — it is no longer gating M5, but its outcome must still land before TestFlight so App Store copy, onboarding, and warning thresholds reflect a real number.
 
 ---
 

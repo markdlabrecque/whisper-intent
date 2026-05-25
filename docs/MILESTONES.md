@@ -137,6 +137,8 @@ Run *after* M3 because we need the real audio + transcription pipeline to measur
 
 **Gate:** if the spike reveals the cap must be uncomfortably short (e.g., <30s), revisit product framing with the user before continuing — that may change the value proposition enough to warrant a scope conversation.
 
+**Status (2026-05-25): Shelved.** Spike wiring landed (commits 180338a, 89ba9e2): a minimal `TranscribeSpeechIntent` drives `TranscriptionSession` with `showUI = false`, and the S3 playback sample ladder is committed under `s3-samples/`. The on-device test matrix is deferred — M5 proceeds with the cap as a parameterized constant in `RecordingConfig`. Spike must close before M6 so App Store copy, onboarding text, and recording-UI warning thresholds reflect a measured number rather than a placeholder.
+
 ---
 
 ## M5 — AppIntent + UI surfaces
