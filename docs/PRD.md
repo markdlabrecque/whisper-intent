@@ -176,7 +176,7 @@ This makes dismissal safe: the user never loses work, and never lands in a confu
 
 A simple in-app settings screen:
 - Default silence threshold (used when an AppIntent invocation doesn't specify one).
-- Toggle: "Show recording UI by default."
+- ~~Toggle: "Show recording UI by default."~~ **Dropped in M5 (2026-05-25).** AppIntent `@Parameter(default:)` is static and can't read `UserDefaults` at parameter-definition time, so the toggle would have had no effect on the Shortcuts editor default. Honoring it at runtime would silently contradict the visible parameter UI. Revisit if a future AppIntents API exposes a dynamic default.
 - About / version / WhisperKit attribution.
 
 Settings are intentionally sparse. The AppIntent parameters carry the per-invocation config; the settings screen exists only for defaults and attribution.

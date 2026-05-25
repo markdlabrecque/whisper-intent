@@ -290,7 +290,7 @@ The visual treatment is the same in both contexts so the user experiences contin
 
 Reads/writes `UserDefaults`:
 - `defaultSilenceThreshold: Double`
-- `showUIByDefault: Bool` *(applied only as the default value the AppIntent suggests in the Shortcuts editor; the per-invocation parameter still wins)*
+- ~~`showUIByDefault: Bool`~~ **Dropped in M5 (2026-05-25).** AppIntent `@Parameter(default:)` is static — it can't read `UserDefaults` at parameter-definition time, so the toggle would have had no effect on the Shortcuts editor's suggested default. See PRD §5.9.
 - Static: app version, WhisperKit attribution, privacy statement.
 
 ## 9. Permissions
@@ -333,15 +333,20 @@ PRD success criterion: <3s from "stop" to "transcript returned" for a 10-second 
 
 - **Unit tests** (`WhisperIntentCoreTests`): `TranscriptionSession` state machine with mock recorder and mock transcriber. VAD with synthetic audio (silence, speech, mixed). Permissions service with mocked status.
 - **Integration tests** (Xcode UI tests, limited): launch app, simulate AppIntent invocation via deeplink (Shortcuts can't easily be scripted in CI), verify state transitions in `RootView`.
-- **Manual smoke tests** documented in `docs/QA.md`:
+- **Manual smoke tests** documented in `docs/M6-test-plan.md` (M6 hardening) and `docs/M5-test-plan.md` (M5 surface gate):
   - Invoke via Siri voice phrase.
   - Invoke via Action Button.
   - Invoke via Shortcuts app.
   - Invoke from lock screen.
-  - Dismiss UI mid-recording, re-open from springboard.
+  - Dismiss UI mid-recording, re-open from springboard. **RootView mirrors the live session per PRD §5.8 (M5 surface).**
   - Dismiss UI mid-transcription, re-open from springboard.
   - Phone-call interruption mid-recording.
   - Cold-boot, unlock, immediately trigger Siri phrase (verifies post-reboot first-unlock constraint).
+  - First-run onboarding (fresh install): three screens, "Record a test" grants mic and completes a real recording, "Skip" path leaves mic ungranted but app usable. (M5 surface.)
+  - Settings persistence across cold-launch: silence-threshold slider change survives a force-quit. (M5 surface.)
+  - "Show onboarding again" from Settings re-presents the onboarding flow without resetting other state. (M5 surface.)
+  - Post-onboarding mic-permission denial path: deep-link to Settings → Whisper Intent → Microphone works and recovers cleanly. (M5 surface.)
+  - `showUI = false` invocation after a fresh force-quit (TDD §9 caveat): either succeeds or fails with `permissionDenied`, no silent hang.
 - **TestFlight signals:** `permissionDenied` rate, `busy` rate, `transcriptionFailed` rate, and observed time-to-transcript distribution. Logged locally only; surfaced via a debug menu in TestFlight builds.
 
 ## 12. Build, ship, release

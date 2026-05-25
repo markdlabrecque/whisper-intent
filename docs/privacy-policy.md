@@ -36,7 +36,7 @@ Whisper Intent does not perform any other data processing.
 
 Whisper Intent stores only the following on your iPhone, all in standard iOS storage that is sandboxed to the app:
 
-- Your settings for default recording behavior (silence threshold, "Show UI" default).
+- Your settings for default recording behavior (currently: silence threshold).
 - The WhisperKit model files that ship with the app, used for on-device transcription.
 
 Whisper Intent does **not** store:
